@@ -1,0 +1,41 @@
+{
+	"name": "bytescript",
+	"description": "The natural language for WebAssembly.",
+	"keywords": [
+		"typescript",
+		"webassembly",
+		"compiler",
+		"bytescript",
+		"wasm"
+	],
+	"version": "0.0.0",
+	"//license": "tbd",
+	"homepage": "https://bytescript.dev",
+	"main": "dist/index.js",
+	"exports": {
+		".": "./dist/index.js",
+		"./*": "./*"
+	},
+	"bin": {
+		"bsc": "./bin/bsc.js"
+	},
+	"scripts": {
+		"": ""
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/bytescriptlang/bytescript.git"
+	},
+	"bugs": {
+		"url": "https://github.com/bytescriptlang/bytescript/issues"
+	},
+	"devDependencies": {
+		"@types/node": "latest",
+		"prettier": "^2.8.3",
+		"typescript": "^5.0.0-beta"
+	},
+	"funding": {
+		"type": "opencollective",
+		"url": "https://opencollective.com/bytescript"
+	}
+}
