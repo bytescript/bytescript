@@ -20,7 +20,7 @@
 		"bsc": "./bin/bsc.js"
 	},
 	"scripts": {
-		"": ""
+		"format:all": "prettier --write ."
 	},
 	"repository": {
 		"type": "git",
