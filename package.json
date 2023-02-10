@@ -1,6 +1,6 @@
 {
-    "name": "hello-world",
-    "displayName": "hello-world",
+    "name": "bytescript",
+    "displayName": "bytescript",
     "description": "Please enter a brief description here",
     "version": "0.0.1",
     "engines": {
@@ -11,19 +11,19 @@
     ],
     "contributes": {
         "languages": [{
-            "id": "hello-world",
-            "aliases": ["Hello World", "hello-world"],
-            "extensions": [".hello"],
+            "id": "bytescript",
+            "aliases": ["ByteScript", "bytescript"],
+            "extensions": [".ts", ".bs"],
             "configuration": "./language-configuration.json"
         }],
         "grammars": [{
-            "language": "hello-world",
-            "scopeName": "source.hello-world",
-            "path": "./syntaxes/hello-world.tmLanguage.json"
+            "language": "bytescript",
+            "scopeName": "source.bytescript",
+            "path": "./syntaxes/bytescript.tmLanguage.json"
         }]
     },
     "activationEvents": [
-        "onLanguage:hello-world"
+        "onLanguage:bytescript"
     ],
     "files": [
         "bin",
@@ -31,7 +31,7 @@
         "src"
     ],
     "bin": {
-        "hello-world-cli": "./bin/cli"
+        "bytescript-cli": "./bin/cli"
     },
     "main": "./out/extension.js",
     "scripts": {

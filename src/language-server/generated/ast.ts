@@ -4,58 +4,116 @@
  ******************************************************************************/
 
 /* eslint-disable */
-import { AstNode, AbstractAstReflection, Reference, ReferenceInfo, TypeMetaData } from 'langium';
+import { AstNode, AbstractAstReflection, ReferenceInfo, TypeMetaData } from 'langium';
 
-export interface Greeting extends AstNode {
-    readonly $container: Model;
-    readonly $type: 'Greeting';
-    person: Reference<Person>
+export type Expression = ClassicFunction;
+
+export const Expression = 'Expression';
+
+export function isExpression(item: unknown): item is Expression {
+    return reflection.isInstance(item, Expression);
 }
 
-export const Greeting = 'Greeting';
-
-export function isGreeting(item: unknown): item is Greeting {
-    return reflection.isInstance(item, Greeting);
+export interface Code extends AstNode {
+    readonly $type: 'Code';
+    statements: Array<Statement>
 }
 
-export interface Model extends AstNode {
-    readonly $type: 'Model';
-    greetings: Array<Greeting>
-    persons: Array<Person>
+export const Code = 'Code';
+
+export function isCode(item: unknown): item is Code {
+    return reflection.isInstance(item, Code);
 }
 
-export const Model = 'Model';
-
-export function isModel(item: unknown): item is Model {
-    return reflection.isInstance(item, Model);
-}
-
-export interface Person extends AstNode {
-    readonly $container: Model;
-    readonly $type: 'Person';
+export interface Param extends AstNode {
+    readonly $container: ClassicFunction;
+    readonly $type: 'Param';
     name: string
 }
 
-export const Person = 'Person';
+export const Param = 'Param';
 
-export function isPerson(item: unknown): item is Person {
-    return reflection.isInstance(item, Person);
+export function isParam(item: unknown): item is Param {
+    return reflection.isInstance(item, Param);
 }
 
-export interface HelloWorldAstType {
-    Greeting: Greeting
-    Model: Model
-    Person: Person
+export interface Statement extends AstNode {
+    readonly $container: ClassicFunction | Code | ConstStatement | LetStatement | Statement;
+    readonly $type: 'ClassicFunction' | 'ConstStatement' | 'LetStatement' | 'Statement';
+    body: Array<Statement>
 }
 
-export class HelloWorldAstReflection extends AbstractAstReflection {
+export const Statement = 'Statement';
+
+export function isStatement(item: unknown): item is Statement {
+    return reflection.isInstance(item, Statement);
+}
+
+export interface ClassicFunction extends Statement {
+    readonly $container: ClassicFunction | Code | ConstStatement | LetStatement | Statement;
+    readonly $type: 'ClassicFunction';
+    body: Array<Statement>
+    name: string
+    params: Array<Param>
+}
+
+export const ClassicFunction = 'ClassicFunction';
+
+export function isClassicFunction(item: unknown): item is ClassicFunction {
+    return reflection.isInstance(item, ClassicFunction);
+}
+
+export interface ConstStatement extends Statement {
+    readonly $container: ClassicFunction | Code | ConstStatement | LetStatement | Statement;
+    readonly $type: 'ConstStatement';
+    name: string
+    value: Expression
+}
+
+export const ConstStatement = 'ConstStatement';
+
+export function isConstStatement(item: unknown): item is ConstStatement {
+    return reflection.isInstance(item, ConstStatement);
+}
+
+export interface LetStatement extends Statement {
+    readonly $container: ClassicFunction | Code | ConstStatement | LetStatement | Statement;
+    readonly $type: 'LetStatement';
+    name: string
+    value: Expression
+}
+
+export const LetStatement = 'LetStatement';
+
+export function isLetStatement(item: unknown): item is LetStatement {
+    return reflection.isInstance(item, LetStatement);
+}
+
+export interface ByteScriptAstType {
+    ClassicFunction: ClassicFunction
+    Code: Code
+    ConstStatement: ConstStatement
+    Expression: Expression
+    LetStatement: LetStatement
+    Param: Param
+    Statement: Statement
+}
+
+export class ByteScriptAstReflection extends AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return ['Greeting', 'Model', 'Person'];
+        return ['ClassicFunction', 'Code', 'ConstStatement', 'Expression', 'LetStatement', 'Param', 'Statement'];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
         switch (subtype) {
+            case ClassicFunction: {
+                return this.isSubtype(Statement, supertype) || this.isSubtype(Expression, supertype);
+            }
+            case ConstStatement:
+            case LetStatement: {
+                return this.isSubtype(Statement, supertype);
+            }
             default: {
                 return false;
             }
@@ -65,9 +123,6 @@ export class HelloWorldAstReflection extends AbstractAstReflection {
     getReferenceType(refInfo: ReferenceInfo): string {
         const referenceId = `${refInfo.container.$type}:${refInfo.property}`;
         switch (referenceId) {
-            case 'Greeting:person': {
-                return Person;
-            }
             default: {
                 throw new Error(`${referenceId} is not a valid reference id.`);
             }
@@ -76,12 +131,45 @@ export class HelloWorldAstReflection extends AbstractAstReflection {
 
     getTypeMetaData(type: string): TypeMetaData {
         switch (type) {
-            case 'Model': {
+            case 'Code': {
                 return {
-                    name: 'Model',
+                    name: 'Code',
                     mandatory: [
-                        { name: 'greetings', type: 'array' },
-                        { name: 'persons', type: 'array' }
+                        { name: 'statements', type: 'array' }
+                    ]
+                };
+            }
+            case 'Statement': {
+                return {
+                    name: 'Statement',
+                    mandatory: [
+                        { name: 'body', type: 'array' }
+                    ]
+                };
+            }
+            case 'ClassicFunction': {
+                return {
+                    name: 'ClassicFunction',
+                    mandatory: [
+                        { name: 'body', type: 'array' },
+                        { name: 'body', type: 'array' },
+                        { name: 'params', type: 'array' }
+                    ]
+                };
+            }
+            case 'ConstStatement': {
+                return {
+                    name: 'ConstStatement',
+                    mandatory: [
+                        { name: 'body', type: 'array' }
+                    ]
+                };
+            }
+            case 'LetStatement': {
+                return {
+                    name: 'LetStatement',
+                    mandatory: [
+                        { name: 'body', type: 'array' }
                     ]
                 };
             }
@@ -95,4 +183,4 @@ export class HelloWorldAstReflection extends AbstractAstReflection {
     }
 }
 
-export const reflection = new HelloWorldAstReflection();
+export const reflection = new ByteScriptAstReflection();

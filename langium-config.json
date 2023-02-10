@@ -1,11 +1,11 @@
 {
-    "projectName": "HelloWorld",
+    "projectName": "ByteScript",
     "languages": [{
-        "id": "hello-world",
-        "grammar": "src/language-server/hello-world.langium",
-        "fileExtensions": [".hello"],
+        "id": "bytescript",
+        "grammar": "src/language-server/bytescript.langium",
+        "fileExtensions": [".ts", ".bs"],
         "textMate": {
-            "out": "syntaxes/hello-world.tmLanguage.json"
+            "out": "syntaxes/bytescript.tmLanguage.json"
         }
     }],
     "out": "src/language-server/generated"

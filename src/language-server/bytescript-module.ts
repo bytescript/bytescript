@@ -2,15 +2,15 @@ import {
     createDefaultModule, createDefaultSharedModule, DefaultSharedModuleContext, inject,
     LangiumServices, LangiumSharedServices, Module, PartialLangiumServices
 } from 'langium';
-import { HelloWorldGeneratedModule, HelloWorldGeneratedSharedModule } from './generated/module';
-import { HelloWorldValidator, registerValidationChecks } from './hello-world-validator';
+import { ByteScriptGeneratedModule, ByteScriptGeneratedSharedModule } from './generated/module';
+import { ByteScriptValidator, registerValidationChecks } from './bytescript-validator';
 
 /**
  * Declaration of custom services - add your own service classes here.
  */
-export type HelloWorldAddedServices = {
+export type ByteScriptAddedServices = {
     validation: {
-        HelloWorldValidator: HelloWorldValidator
+        ByteScriptValidator: ByteScriptValidator
     }
 }
 
@@ -18,16 +18,16 @@ export type HelloWorldAddedServices = {
  * Union of Langium default services and your custom services - use this as constructor parameter
  * of custom service classes.
  */
-export type HelloWorldServices = LangiumServices & HelloWorldAddedServices
+export type ByteScriptServices = LangiumServices & ByteScriptAddedServices
 
 /**
  * Dependency injection module that overrides Langium default services and contributes the
  * declared custom services. The Langium defaults can be partially specified to override only
  * selected services, while the custom services must be fully specified.
  */
-export const HelloWorldModule: Module<HelloWorldServices, PartialLangiumServices & HelloWorldAddedServices> = {
+export const ByteScriptModule: Module<ByteScriptServices, PartialLangiumServices & ByteScriptAddedServices> = {
     validation: {
-        HelloWorldValidator: () => new HelloWorldValidator()
+        ByteScriptValidator: () => new ByteScriptValidator()
     }
 };
 
@@ -46,20 +46,20 @@ export const HelloWorldModule: Module<HelloWorldServices, PartialLangiumServices
  * @param context Optional module context with the LSP connection
  * @returns An object wrapping the shared services and the language-specific services
  */
-export function createHelloWorldServices(context: DefaultSharedModuleContext): {
-    shared: LangiumSharedServices,
-    HelloWorld: HelloWorldServices
+export function createByteScriptServices(context: DefaultSharedModuleContext): {
+    shared: LangiumSharedServices;
+    ByteScript: ByteScriptServices;
 } {
     const shared = inject(
         createDefaultSharedModule(context),
-        HelloWorldGeneratedSharedModule
+        ByteScriptGeneratedSharedModule
     );
-    const HelloWorld = inject(
+    const ByteScript = inject(
         createDefaultModule({ shared }),
-        HelloWorldGeneratedModule,
-        HelloWorldModule
+        ByteScriptGeneratedModule,
+        ByteScriptModule
     );
-    shared.ServiceRegistry.register(HelloWorld);
-    registerValidationChecks(HelloWorld);
-    return { shared, HelloWorld };
+    shared.ServiceRegistry.register(ByteScript);
+    registerValidationChecks(ByteScript);
+    return { shared, ByteScript };
 }

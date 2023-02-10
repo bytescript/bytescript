@@ -1,16 +1,16 @@
 import chalk from 'chalk';
 import { Command } from 'commander';
-import { Model } from '../language-server/generated/ast';
-import { HelloWorldLanguageMetaData } from '../language-server/generated/module';
-import { createHelloWorldServices } from '../language-server/hello-world-module';
+import { Code } from '../language-server/generated/ast';
+import { ByteScriptLanguageMetaData } from '../language-server/generated/module';
+import { createByteScriptServices } from '../language-server/bytescript-module';
 import { extractAstNode } from './cli-util';
 import { generateJavaScript } from './generator';
 import { NodeFileSystem } from 'langium/node';
 
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
-    const services = createHelloWorldServices(NodeFileSystem).HelloWorld;
-    const model = await extractAstNode<Model>(fileName, services);
-    const generatedFilePath = generateJavaScript(model, fileName, opts.destination);
+    const services = createByteScriptServices(NodeFileSystem).ByteScript;
+    const code = await extractAstNode<Code>(fileName, services);
+    const generatedFilePath = generateJavaScript(code, fileName, opts.destination);
     console.log(chalk.green(`JavaScript code generated successfully: ${generatedFilePath}`));
 };
 
@@ -25,7 +25,7 @@ export default function(): void {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         .version(require('../../package.json').version);
 
-    const fileExtensions = HelloWorldLanguageMetaData.fileExtensions.join(', ');
+    const fileExtensions = ByteScriptLanguageMetaData.fileExtensions.join(', ');
     program
         .command('generate')
         .argument('<file>', `source file (possible file extensions: ${fileExtensions})`)

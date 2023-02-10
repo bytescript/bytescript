@@ -33,12 +33,12 @@ function startLanguageClient(context: vscode.ExtensionContext): LanguageClient {
         debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
     };
 
-    const fileSystemWatcher = vscode.workspace.createFileSystemWatcher('**/*.hello');
+    const fileSystemWatcher = vscode.workspace.createFileSystemWatcher('**/*.{ts,bs}');
     context.subscriptions.push(fileSystemWatcher);
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{ scheme: 'file', language: 'hello-world' }],
+        documentSelector: [{ scheme: 'file', language: 'bytescript' }],
         synchronize: {
             // Notify the server about file changes to files contained in the workspace
             fileEvents: fileSystemWatcher
@@ -47,8 +47,8 @@ function startLanguageClient(context: vscode.ExtensionContext): LanguageClient {
 
     // Create the language client and start the client.
     const client = new LanguageClient(
-        'hello-world',
-        'Hello World',
+        'bytescript',
+        'ByteScript',
         serverOptions,
         clientOptions
     );

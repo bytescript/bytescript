@@ -4,21 +4,21 @@
  ******************************************************************************/
 
 import { LangiumGeneratedServices, LangiumGeneratedSharedServices, LangiumSharedServices, LangiumServices, LanguageMetaData, Module } from 'langium';
-import { HelloWorldAstReflection } from './ast';
-import { HelloWorldGrammar } from './grammar';
+import { ByteScriptAstReflection } from './ast';
+import { ByteScriptGrammar } from './grammar';
 
-export const HelloWorldLanguageMetaData: LanguageMetaData = {
-    languageId: 'hello-world',
-    fileExtensions: ['.hello'],
+export const ByteScriptLanguageMetaData: LanguageMetaData = {
+    languageId: 'bytescript',
+    fileExtensions: ['.ts', '.bs'],
     caseInsensitive: false
 };
 
-export const HelloWorldGeneratedSharedModule: Module<LangiumSharedServices, LangiumGeneratedSharedServices> = {
-    AstReflection: () => new HelloWorldAstReflection()
+export const ByteScriptGeneratedSharedModule: Module<LangiumSharedServices, LangiumGeneratedSharedServices> = {
+    AstReflection: () => new ByteScriptAstReflection()
 };
 
-export const HelloWorldGeneratedModule: Module<LangiumServices, LangiumGeneratedServices> = {
-    Grammar: () => HelloWorldGrammar(),
-    LanguageMetaData: () => HelloWorldLanguageMetaData,
+export const ByteScriptGeneratedModule: Module<LangiumServices, LangiumGeneratedServices> = {
+    Grammar: () => ByteScriptGrammar(),
+    LanguageMetaData: () => ByteScriptLanguageMetaData,
     parser: {}
 };
