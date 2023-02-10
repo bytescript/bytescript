@@ -12,9 +12,7 @@ export function generateJavaScript(code: Code, filePath: string, destination: st
 	fileNode.append('"use strict";', NL, NL)
 	code.statements.forEach(stmt => fileNode.append(`console.log('Hello, ${stmt.$type}!');`, NL))
 
-	if (!fs.existsSync(data.destination)) {
-		fs.mkdirSync(data.destination, {recursive: true})
-	}
+	if (!fs.existsSync(data.destination)) fs.mkdirSync(data.destination, {recursive: true})
 	fs.writeFileSync(generatedFilePath, toString(fileNode))
 	return generatedFilePath
 }

@@ -21,9 +21,8 @@ export class ByteScriptValidator {
 	checkLetStatementTotallyBogus(letStmt: LetStatement, accept: ValidationAcceptor): void {
 		if (letStmt.name) {
 			const firstChar = letStmt.name.substring(0, 1)
-			if (firstChar.toUpperCase() !== firstChar) {
+			if (firstChar.toUpperCase() !== firstChar)
 				accept('warning', 'Let statement totally bogus error!', {node: letStmt, property: 'name'})
-			}
 		}
 	}
 }
