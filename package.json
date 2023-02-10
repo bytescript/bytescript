@@ -1,65 +1,75 @@
 {
-    "name": "bytescript",
-    "displayName": "bytescript",
-    "description": "Please enter a brief description here",
-    "version": "0.0.1",
-    "engines": {
-        "vscode": "^1.56.0"
-    },
-    "categories": [
-        "Programming Languages"
-    ],
-    "contributes": {
-        "languages": [{
-            "id": "bytescript",
-            "aliases": ["ByteScript", "bytescript"],
-            "extensions": [".ts", ".bs"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "bytescript",
-            "scopeName": "source.bytescript",
-            "path": "./syntaxes/bytescript.tmLanguage.json"
-        }]
-    },
-    "activationEvents": [
-        "onLanguage:bytescript"
-    ],
-    "files": [
-        "bin",
-        "out",
-        "src"
-    ],
-    "bin": {
-        "bytescript-cli": "./bin/cli"
-    },
-    "main": "./out/extension.js",
-    "scripts": {
-        "vscode:prepublish": "npm run build && npm run lint",
-        "build": "tsc -b tsconfig.json",
-        "watch": "tsc -b tsconfig.json --watch",
-        "lint": "eslint src --ext ts",
-        "langium:generate": "langium generate",
-        "langium:watch": "langium generate --watch",
-        "format:all": "prettier --write ."
-    },
-    "dependencies": {
-        "chalk": "^4.1.2",
-        "chevrotain": "^10.4.1",
-        "commander": "^8.0.0",
-        "langium": "~1.0.0",
-        "vscode-languageclient": "^8.0.2",
-        "vscode-languageserver": "^8.0.2",
-        "vscode-uri": "^3.0.2"
-    },
-    "devDependencies": {
-        "@types/node": "^14.17.3",
-        "@types/vscode": "^1.56.0",
-        "@typescript-eslint/eslint-plugin": "^5.28.0",
-        "@typescript-eslint/parser": "^5.28.0",
-        "eslint": "^8.17.0",
-        "langium-cli": "~1.0.0",
-        "prettier": "^2.8.4",
-        "typescript": "^4.9.4"
-    }
+	"name": "bytescript",
+	"displayName": "bytescript",
+	"description": "Please enter a brief description here",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.56.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "bytescript",
+				"aliases": [
+					"ByteScript",
+					"bytescript"
+				],
+				"extensions": [
+					".ts",
+					".bs"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "bytescript",
+				"scopeName": "source.bytescript",
+				"path": "./syntaxes/bytescript.tmLanguage.json"
+			}
+		]
+	},
+	"activationEvents": [
+		"onLanguage:bytescript"
+	],
+	"files": [
+		"bin",
+		"out",
+		"src"
+	],
+	"bin": {
+		"bytescript-cli": "./bin/cli"
+	},
+	"main": "./out/extension.js",
+	"scripts": {
+		"vscode:prepublish": "npm run build && npm run lint",
+		"build": "tsc -b tsconfig.json",
+		"watch": "tsc -b tsconfig.json --watch",
+		"lint": "eslint src --ext ts",
+		"langium:generate": "langium generate",
+		"langium:watch": "langium generate --watch",
+		"format:all": "prettier --write ."
+	},
+	"dependencies": {
+		"chalk": "^4.1.2",
+		"chevrotain": "^10.4.1",
+		"commander": "^8.0.0",
+		"langium": "~1.0.0",
+		"vscode-languageclient": "^8.0.2",
+		"vscode-languageserver": "^8.0.2",
+		"vscode-uri": "^3.0.2"
+	},
+	"devDependencies": {
+		"@types/node": "^14.17.3",
+		"@types/vscode": "^1.56.0",
+		"@typescript-eslint/eslint-plugin": "^5.28.0",
+		"@typescript-eslint/parser": "^5.28.0",
+		"eslint": "^8.17.0",
+		"langium-cli": "~1.0.0",
+		"prettier": "^2.8.4",
+		"typescript": "^4.9.4"
+	}
 }

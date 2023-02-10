@@ -1,12 +1,14 @@
 {
-    "projectName": "ByteScript",
-    "languages": [{
-        "id": "bytescript",
-        "grammar": "src/language-server/bytescript.langium",
-        "fileExtensions": [".ts", ".bs"],
-        "textMate": {
-            "out": "syntaxes/bytescript.tmLanguage.json"
-        }
-    }],
-    "out": "src/language-server/generated"
+	"projectName": "ByteScript",
+	"languages": [
+		{
+			"id": "bytescript",
+			"grammar": "src/language-server/bytescript.langium",
+			"fileExtensions": [".ts", ".bs"],
+			"textMate": {
+				"out": "syntaxes/bytescript.tmLanguage.json"
+			}
+		}
+	],
+	"out": "src/language-server/generated"
 }

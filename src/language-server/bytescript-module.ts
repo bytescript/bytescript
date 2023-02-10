@@ -1,17 +1,23 @@
 import {
-    createDefaultModule, createDefaultSharedModule, DefaultSharedModuleContext, inject,
-    LangiumServices, LangiumSharedServices, Module, PartialLangiumServices
-} from 'langium';
-import { ByteScriptGeneratedModule, ByteScriptGeneratedSharedModule } from './generated/module';
-import { ByteScriptValidator, registerValidationChecks } from './bytescript-validator';
+	createDefaultModule,
+	createDefaultSharedModule,
+	DefaultSharedModuleContext,
+	inject,
+	LangiumServices,
+	LangiumSharedServices,
+	Module,
+	PartialLangiumServices,
+} from 'langium'
+import {ByteScriptGeneratedModule, ByteScriptGeneratedSharedModule} from './generated/module'
+import {ByteScriptValidator, registerValidationChecks} from './bytescript-validator'
 
 /**
  * Declaration of custom services - add your own service classes here.
  */
 export type ByteScriptAddedServices = {
-    validation: {
-        ByteScriptValidator: ByteScriptValidator
-    }
+	validation: {
+		ByteScriptValidator: ByteScriptValidator
+	}
 }
 
 /**
@@ -26,10 +32,10 @@ export type ByteScriptServices = LangiumServices & ByteScriptAddedServices
  * selected services, while the custom services must be fully specified.
  */
 export const ByteScriptModule: Module<ByteScriptServices, PartialLangiumServices & ByteScriptAddedServices> = {
-    validation: {
-        ByteScriptValidator: () => new ByteScriptValidator()
-    }
-};
+	validation: {
+		ByteScriptValidator: () => new ByteScriptValidator(),
+	},
+}
 
 /**
  * Create the full set of services required by Langium.
@@ -47,19 +53,12 @@ export const ByteScriptModule: Module<ByteScriptServices, PartialLangiumServices
  * @returns An object wrapping the shared services and the language-specific services
  */
 export function createByteScriptServices(context: DefaultSharedModuleContext): {
-    shared: LangiumSharedServices;
-    ByteScript: ByteScriptServices;
+	shared: LangiumSharedServices
+	ByteScript: ByteScriptServices
 } {
-    const shared = inject(
-        createDefaultSharedModule(context),
-        ByteScriptGeneratedSharedModule
-    );
-    const ByteScript = inject(
-        createDefaultModule({ shared }),
-        ByteScriptGeneratedModule,
-        ByteScriptModule
-    );
-    shared.ServiceRegistry.register(ByteScript);
-    registerValidationChecks(ByteScript);
-    return { shared, ByteScript };
+	const shared = inject(createDefaultSharedModule(context), ByteScriptGeneratedSharedModule)
+	const ByteScript = inject(createDefaultModule({shared}), ByteScriptGeneratedModule, ByteScriptModule)
+	shared.ServiceRegistry.register(ByteScript)
+	registerValidationChecks(ByteScript)
+	return {shared, ByteScript}
 }
