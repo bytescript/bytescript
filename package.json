@@ -40,11 +40,12 @@
         "watch": "tsc -b tsconfig.json --watch",
         "lint": "eslint src --ext ts",
         "langium:generate": "langium generate",
-        "langium:watch": "langium generate --watch"
+        "langium:watch": "langium generate --watch",
+        "format:all": "prettier --write ."
     },
     "dependencies": {
-        "chevrotain": "^10.4.1",
         "chalk": "^4.1.2",
+        "chevrotain": "^10.4.1",
         "commander": "^8.0.0",
         "langium": "~1.0.0",
         "vscode-languageclient": "^8.0.2",
@@ -58,6 +59,7 @@
         "@typescript-eslint/parser": "^5.28.0",
         "eslint": "^8.17.0",
         "langium-cli": "~1.0.0",
+        "prettier": "^2.8.4",
         "typescript": "^4.9.4"
     }
 }
