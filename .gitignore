@@ -4,6 +4,7 @@
 !.vscode/extensions.json
 !.vscode/launch.json
 node_modules/
+package-lock.json
 out/
 syntaxes/
 src/language-server/generated/
