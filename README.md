@@ -2,6 +2,10 @@
   <a href="https://bytescript.dev" target="_blank" rel="noopener"><img width="100" src="...TODO LOGO URL..." alt="ByteScript logo"></a>
 </p> -->
 
+# ByteScript
+
+(Coming Soon)
+
 <p align="justify"><strong>ByteScript</strong> compiles a subset/superset <a
 href="http://www.typescriptlang.org">TypeScript</a> (JavaScript with types) to
 <a href="http://webassembly.org">WebAssembly</a>. It is designed to be the
