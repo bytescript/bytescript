@@ -7,7 +7,7 @@ import {extractAstNode} from './cli-util'
 import {generateJavaScript} from './generator'
 import {NodeFileSystem} from 'langium/node'
 
-export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
+export async function generate(fileName: string, opts: GenerateOptions): Promise<void> {
 	const services = createByteScriptServices(NodeFileSystem).ByteScript
 	const code = await extractAstNode<Code>(fileName, services)
 	const generatedFilePath = generateJavaScript(code, fileName, opts.destination)
@@ -31,7 +31,7 @@ export default function (): void {
 		.argument('<file>', `source file (possible file extensions: ${fileExtensions})`)
 		.option('-d, --destination <dir>', 'destination directory of generating')
 		.description('generates JavaScript code that prints "Hello, {name}!" for each greeting in a source file')
-		.action(generateAction)
+		.action(generate)
 
 	program.parse(process.argv)
 }

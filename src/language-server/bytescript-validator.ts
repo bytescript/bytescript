@@ -9,7 +9,7 @@ export function registerValidationChecks(services: ByteScriptServices) {
 	const registry = services.validation.ValidationRegistry
 	const validator = services.validation.ByteScriptValidator
 	const checks: ValidationChecks<ByteScriptAstType> = {
-		LetStatement: validator.checkLetStatementTotallyBogus,
+		LetStatement: validator.checkLetStatement,
 	}
 	registry.register(checks, validator)
 }
@@ -18,11 +18,11 @@ export function registerValidationChecks(services: ByteScriptServices) {
  * Implementation of custom validations.
  */
 export class ByteScriptValidator {
-	checkLetStatementTotallyBogus(letStmt: LetStatement, accept: ValidationAcceptor): void {
+	checkLetStatement(letStmt: LetStatement, accept: ValidationAcceptor): void {
 		if (letStmt.name) {
 			const firstChar = letStmt.name.substring(0, 1)
 			if (firstChar.toUpperCase() !== firstChar)
-				accept('warning', 'Let statement totally bogus error!', {node: letStmt, property: 'name'})
+				accept('error', 'Let statement: Expected upper case var name!', {node: letStmt, property: 'name'})
 		}
 	}
 }
