@@ -1,30 +1,30 @@
 grammar ByteScript
 
 entry Code:
-    statements+=Statement*;
+	statements+=Statement*;
 
 Statement:
-    LetStatement | ConstStatement | ClassicFunction | Block;
+	LetStatement | ConstStatement | ClassicFunction | Block;
 
 LetStatement:
-    'let' name=Identifier '=' value=Expression;
+	'let' name=Identifier '=' value=Expression;
 
 ConstStatement:
-    'const' name=Identifier '=' value=Expression;
+	'const' name=Identifier '=' value=Expression;
 
 Expression:
-    ClassicFunction | STRING | INT  | Identifier;
+	ClassicFunction | STRING | INT  | Identifier;
 
 // This is called Functionn for now, because it complains that Function is taken
 // for JS.
 ClassicFunction:
-    'function' name=Identifier '(' ( params+=Param (',' params+=Param)* )? ')' Block;
+	'function' name=Identifier '(' ( params+=Param (',' params+=Param)* )? ')' Block;
 
 Param:
-    name=Identifier;
+	name=Identifier;
 
 fragment Block:
-    '{' body+=Statement* '}';
+	'{' body+=Statement* '}';
 
 hidden terminal WS: /\s+/;
 terminal Identifier: /[_a-zA-Z][\w_]*/;
