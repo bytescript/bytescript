@@ -4,17 +4,19 @@ entry ByteScriptCode:
 	statements+=Statement*;
 
 Statement:
-	VariableDeclaration | ClassicFunction | Block;
+	VariableDeclaration | ClassicFunction<true> | Block;
 
 VariableDeclaration:
 	('var' | 'let' | 'const') name=IDENTIFIER '=' value=Expression;
 
 Expression:
-	ClassicFunction | STRING | INT  | IDENTIFIER;
+	ClassicFunction<false> | STRING | INT  | IDENTIFIER;
 
 // Classic js `function`
-ClassicFunction:
-	'function' name=IDENTIFIER '(' ( params+=Param (',' params+=Param)* )? ')' Block;
+ClassicFunction<nameRequired>:
+	'function' (<nameRequired> name=IDENTIFIER | <!nameRequired>name=IDENTIFIER?) '('
+		( params+=Param (',' params+=Param)* )?
+	')' Block;
 
 Param:
 	name=IDENTIFIER;
