@@ -7,24 +7,24 @@ Statement:
 	VariableDeclaration | ClassicFunction | Block;
 
 VariableDeclaration:
-	('var' | 'let' | 'const') name=Identifier '=' value=Expression;
+	('var' | 'let' | 'const') name=IDENTIFIER '=' value=Expression;
 
 Expression:
-	ClassicFunction | STRING | INT  | Identifier;
+	ClassicFunction | STRING | INT  | IDENTIFIER;
 
-// This is called Functionn for now, because it complains that Function is taken
-// for JS.
+// Classic js `function`
 ClassicFunction:
-	'function' name=Identifier '(' ( params+=Param (',' params+=Param)* )? ')' Block;
+	'function' name=IDENTIFIER '(' ( params+=Param (',' params+=Param)* )? ')' Block;
 
 Param:
-	name=Identifier;
+	name=IDENTIFIER;
 
 fragment Block:
 	'{' body+=Statement* '}';
 
+// Convention: terminals are named in all caps.
 hidden terminal WS: /\s+/;
-terminal Identifier: /[_a-zA-Z][\w_]*/;
+terminal IDENTIFIER: /[_a-zA-Z][\w_]*/;
 terminal INT returns number: /[0-9]+/;
 terminal STRING: /"[^"]*"|'[^']*'/;
 
