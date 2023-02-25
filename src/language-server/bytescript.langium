@@ -10,18 +10,15 @@ VariableDeclaration:
 	type=('var' | 'let' | 'const') name=IDENTIFIER '=' value=Expression;
 
 Expression:
-	ClassicFunction<false> | SimpleExpression;
+	ClassicFunction<false> | FloatLiteral | IntegerLiteral | Identifier;
 
-SimpleExpression infers Expression:
-	FloatExpression | IntExpression | IdentifierExpression;
-
-FloatExpression:
+FloatLiteral:
 	value=FLOAT;
 
-IntExpression:
+IntegerLiteral:
 	value=INT;
 
-IdentifierExpression:
+Identifier:
 	value=IDENTIFIER;
 
 // Classic js `function`
