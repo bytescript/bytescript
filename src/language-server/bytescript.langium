@@ -4,13 +4,20 @@ entry ByteScriptCode:
 	statements+=Statement*;
 
 Statement:
-	VariableDeclaration | ClassicFunction<true> | Block;
+	VariableDeclaration
+	| ClassicFunction<true>
+	// For now, a function call is a statement (but later we'll want to allow
+	// any expression to be a statement)
+	| FunctionCall;
 
 VariableDeclaration:
 	type=('var' | 'let' | 'const') name=IDENTIFIER '=' value=Expression;
 
 Expression:
-	ClassicFunction<false> | FloatLiteral | IntegerLiteral | Identifier;
+	ClassicFunction<false> | NumberLiteral | Identifier;
+
+NumberLiteral:
+	FloatLiteral | IntegerLiteral;
 
 FloatLiteral:
 	value=FLOAT;
@@ -30,6 +37,17 @@ ClassicFunction<nameRequired>:
 Param:
 	name=IDENTIFIER;
 
+FunctionCall:
+	name=IDENTIFIER '('
+		( args+=CallArgs (',' args+=CallArgs)* )?
+	')';
+
+
+// Normally function args can be any Expression, but for now we are limiting it
+// to numbers or variables only.
+CallArgs:
+	NumberLiteral | Identifier;
+
 fragment Block:
 	'{' body+=Statement* '}';
 
@@ -38,7 +56,7 @@ hidden terminal WS: /\s+/;
 terminal IDENTIFIER: /[_a-zA-Z][\w_]*/;
 terminal FLOAT returns number: /[0-9]+\.[0-9]*/;
 terminal INT returns number: /[0-9]+/;
-terminal STRING: /"[^"]*"|'[^']*'/;
+terminal STRING: /"[^"]*"|'[^']*'/; // We're not handling strings yet.
 
 hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
 hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
