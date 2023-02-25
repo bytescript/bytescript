@@ -1,16 +1,13 @@
 grammar ByteScript
 
-entry Code:
+entry ByteScriptCode:
 	statements+=Statement*;
 
 Statement:
-	LetStatement | ConstStatement | ClassicFunction | Block;
+	VariableDeclaration | ClassicFunction | Block;
 
-LetStatement:
-	'let' name=Identifier '=' value=Expression;
-
-ConstStatement:
-	'const' name=Identifier '=' value=Expression;
+VariableDeclaration:
+	('var' | 'let' | 'const') name=Identifier '=' value=Expression;
 
 Expression:
 	ClassicFunction | STRING | INT  | Identifier;

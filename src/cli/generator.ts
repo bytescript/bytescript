@@ -1,10 +1,10 @@
 import fs from 'fs'
 import {CompositeGeneratorNode, NL, toString} from 'langium'
 import path from 'path'
-import {Code} from '../language-server/generated/ast'
+import {ByteScriptCode} from '../language-server/generated/ast'
 import {extractDestinationAndName} from './cli-util'
 
-export function generateJavaScript(code: Code, filePath: string, destination: string | undefined): string {
+export function generateJavaScript(code: ByteScriptCode, filePath: string, destination: string | undefined): string {
 	const data = extractDestinationAndName(filePath, destination)
 	const generatedFilePath = `${path.join(data.destination, data.name)}.js`
 
