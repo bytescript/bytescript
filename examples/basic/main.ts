@@ -9,7 +9,7 @@ function doSomething(foo) {
 	/**
 	 * This is a var
 	 */
-	let Foo = 456
+	let Foo = 4.56
 }
 
 /**
