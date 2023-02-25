@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import {Command} from 'commander'
-import {ByteScriptCode} from '../language-server/generated/ast'
+import type {ByteScriptCode} from '../language-server/generated/ast'
 import {ByteScriptLanguageMetaData} from '../language-server/generated/module'
 import {createByteScriptServices} from '../language-server/bytescript-module'
 import {extractAstNode} from './cli-util'

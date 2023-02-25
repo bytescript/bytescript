@@ -1,7 +1,7 @@
 import fs from 'fs'
 import {CompositeGeneratorNode, NL, toString} from 'langium'
 import path from 'path'
-import {ByteScriptCode} from '../language-server/generated/ast'
+import type {ByteScriptCode} from '../language-server/generated/ast'
 import {extractDestinationAndName} from './cli-util'
 
 export function generateJavaScript(code: ByteScriptCode, filePath: string, destination: string | undefined): string {
