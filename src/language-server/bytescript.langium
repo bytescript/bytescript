@@ -37,7 +37,7 @@ SumExpression:
 	ProductExpression ({infer BinaryExpression.lhs=current} rhs=ProductExpression)*;
 
 ProductExpression:
-	PathExpression ({infer BinaryExpression.lhs=current} rhs=PathExpression);
+	PathExpression ({infer BinaryExpression.lhs=current} rhs=PathExpression)*;
 
 PathExpression:
 	PrimaryExpression (
