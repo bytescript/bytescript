@@ -49,7 +49,7 @@ PrimaryExpression:
 	 GroupLiteral | Identifier;
 
 NumberLiteral:
-	FloatLiteral | IntegerLiteral | GroupLiteral;
+	FloatLiteral | IntegerLiteral;
 
 FloatLiteral:
 	value=FLOAT;
