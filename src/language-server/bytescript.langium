@@ -42,10 +42,11 @@ ProductExpression:
 PathExpression:
 	PrimaryExpression (
 		{infer CallExpression.callee=current} "(" (args+=Expression ("," args+=Expression)* ","? )? ")"
-	)*;
+	)*
+	| NumberLiteral;
 
 PrimaryExpression:
-	NumberLiteral | GroupLiteral | Identifier;
+	 GroupLiteral | Identifier;
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral | GroupLiteral;
