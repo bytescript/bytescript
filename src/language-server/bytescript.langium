@@ -1,34 +1,63 @@
 grammar ByteScript
 
 entry ByteScriptCode:
-	statements+=Statement*;
+	statements+=TopLevelStatement*;
+
+TopLevelStatement:
+	ExportStatement
+	| Statement;
+
+ExportStatement:
+	"export" statement=DeclarationStatement ";"?;
+
+DeclarationStatement:
+	VariableDeclaration | ClassicFunction<true>;
 
 Statement:
 	VariableDeclaration
 	| ClassicFunction<true>
+	| ReturnStatement
 	// For now, a function call is a statement (but later we'll want to allow
 	// any expression to be a statement, and a function call can also be an
 	// expression)
-	| FunctionCall;
+	| ExpressionStatement;
+
+ExpressionStatement:
+	expression=Expression ";"?;
+
+ReturnStatement:
+	"return" expression=Expression ";"?;
 
 VariableDeclaration:
 	variant=('var' | 'let' | 'const') name=IDENTIFIER (':' type=TypeExpression)? ('=' value=Expression)?;
 
-Expression:
-	NumberLiteral
-	| Identifier
-	// Disable for now, we don't support passing around lambdas yet.
-	// | ClassicFunction<false>
-;
+Expression: SumExpression;
+
+SumExpression:
+	ProductExpression ({infer BinaryExpression.lhs=current} rhs=ProductExpression)*;
+
+ProductExpression:
+	PathExpression ({infer BinaryExpression.lhs=current} rhs=PathExpression);
+
+PathExpression:
+	PrimaryExpression (
+		{infer CallExpression.callee=current} "(" (args+=Expression ("," args+=Expression)* ","? )? ")"
+	)*;
+
+PrimaryExpression:
+	NumberLiteral | GroupLiteral | Identifier;
 
 NumberLiteral:
-	FloatLiteral | IntegerLiteral;
+	FloatLiteral | IntegerLiteral | GroupLiteral;
 
 FloatLiteral:
 	value=FLOAT;
 
 IntegerLiteral:
 	value=INT;
+
+GroupLiteral:
+	"(" value=Expression ")";
 
 Identifier:
 	value=IDENTIFIER;
@@ -42,15 +71,6 @@ ClassicFunction<nameRequired>:
 Param:
 	name=IDENTIFIER (':' type=TypeExpression)?;
 
-FunctionCall:
-	name=IDENTIFIER '('
-		( args+=CallArgs (',' args+=CallArgs)* )?
-	')';
-
-// Normally function args can be any Expression, but for now we are limiting it
-// to numbers or variables only.
-CallArgs:
-	NumberLiteral | Identifier;
 
 fragment Block:
 	'{' body+=Statement* '}';

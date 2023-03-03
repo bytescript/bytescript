@@ -1,5 +1,5 @@
 import type {AstNode, ValidationAcceptor, ValidationChecks} from 'langium'
-import type {ByteScriptAstType, ClassicFunction, VariableDeclaration, FunctionCall} from './generated/ast'
+import {ByteScriptAstType, ClassicFunction, VariableDeclaration, CallExpression, isIdentifier} from './generated/ast'
 import type {ByteScriptServices} from './bytescript-module'
 import {getType, isAssignable} from './types/types'
 import {isErrorType, TypeDescription, typeToString} from './types/descriptions'
@@ -13,7 +13,7 @@ export function registerValidationChecks(services: ByteScriptServices) {
 	const checks: ValidationChecks<ByteScriptAstType> = {
 		VariableDeclaration: validator.checkVarDeclaration,
 		ClassicFunction: validator.checkClassicFunction,
-		FunctionCall: validator.checkFunctionCall,
+		CallExpression: validator.checkCallExpression,
 	}
 	registry.register(checks, validator)
 }
@@ -58,12 +58,13 @@ export class ByteScriptValidator {
 		if (acceptErrorType(func, type, accept)) return
 	}
 
-	checkFunctionCall(call: FunctionCall, accept: ValidationAcceptor) {
-		console.log(call)
-		if (call.name) {
-			const firstChar = call.name.substring(0, 1)
-			if (firstChar.toLowerCase() !== firstChar)
-				accept('error', 'FunctionCall: Expected lower case name.', {node: call, property: 'name'})
+	checkCallExpression(call: CallExpression, accept: ValidationAcceptor) {
+		if (isIdentifier(call.callee)) {
+			const identifier = call.callee
+			const char = identifier.value.charAt(0)
+			if (char.toLowerCase() !== char) {
+				accept('error', 'FunctionCall: Expected lower case name.', {node: call, property: 'callee'})
+			}
 		}
 	}
 }
