@@ -20,7 +20,11 @@ Statement:
 	// For now, a function call is a statement (but later we'll want to allow
 	// any expression to be a statement, and a function call can also be an
 	// expression)
-	| ExpressionStatement;
+	| ExpressionStatement
+	| EmptyStatement;
+
+EmptyStatement:
+	empty?=";"+;
 
 ExpressionStatement:
 	expression=Expression ";"?;
@@ -31,22 +35,27 @@ ReturnStatement:
 VariableDeclaration:
 	variant=('var' | 'let' | 'const') name=IDENTIFIER (':' type=TypeExpression)? ('=' value=Expression)?;
 
-Expression: SumExpression;
+Expression: 
+	AssignmentExpression;
+
+AssignmentExpression:
+	Identifier ({infer BinaryExpression.lhs=current} op="=" rhs=SumExpression)*
+	| SumExpression;
 
 SumExpression:
-	ProductExpression ({infer BinaryExpression.lhs=current} rhs=ProductExpression)*;
+	ProductExpression ({infer BinaryExpression.lhs=current} op=("+" | "-") rhs=ProductExpression)*;
 
 ProductExpression:
-	PathExpression ({infer BinaryExpression.lhs=current} rhs=PathExpression)*;
+	PathExpression ({infer BinaryExpression.lhs=current} op=("*" | "/") rhs=PathExpression)*;
 
 PathExpression:
-	PrimaryExpression (
+	Identifier (
 		{infer CallExpression.callee=current} "(" (args+=Expression ("," args+=Expression)* ","? )? ")"
 	)*
-	| NumberLiteral;
+	| PrimaryExpression;
 
 PrimaryExpression:
-	 GroupLiteral | Identifier;
+	 GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis;
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral;
@@ -59,6 +68,9 @@ IntegerLiteral:
 
 GroupLiteral:
 	"(" value=Expression ")";
+
+InvalidParenthesis:
+	empty?="(" ")";
 
 Identifier:
 	value=IDENTIFIER;

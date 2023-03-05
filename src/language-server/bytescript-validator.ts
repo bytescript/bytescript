@@ -1,5 +1,12 @@
 import type {AstNode, ValidationAcceptor, ValidationChecks} from 'langium'
-import {ByteScriptAstType, ClassicFunction, VariableDeclaration, CallExpression, isIdentifier} from './generated/ast'
+import {
+	ByteScriptAstType,
+	ClassicFunction,
+	VariableDeclaration,
+	CallExpression,
+	isIdentifier,
+	InvalidParenthesis,
+} from './generated/ast'
 import type {ByteScriptServices} from './bytescript-module'
 import {getType, isAssignable} from './types/types'
 import {isErrorType, TypeDescription, typeToString} from './types/descriptions'
@@ -14,6 +21,7 @@ export function registerValidationChecks(services: ByteScriptServices) {
 		VariableDeclaration: validator.checkVarDeclaration,
 		ClassicFunction: validator.checkClassicFunction,
 		CallExpression: validator.checkCallExpression,
+		InvalidParenthesis: validator.checkInvalidParenthesis,
 	}
 	registry.register(checks, validator)
 }
@@ -66,6 +74,10 @@ export class ByteScriptValidator {
 				accept('error', 'FunctionCall: Expected lower case name.', {node: call, property: 'callee'})
 			}
 		}
+	}
+
+	checkInvalidParenthesis(expression: InvalidParenthesis, accept: ValidationAcceptor) {
+		accept('error', 'SyntaxError: Expected expression.', {node: expression})
 	}
 }
 
