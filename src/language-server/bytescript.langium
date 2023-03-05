@@ -17,9 +17,6 @@ Statement:
 	VariableDeclaration
 	| ClassicFunction<true>
 	| ReturnStatement
-	// For now, a function call is a statement (but later we'll want to allow
-	// any expression to be a statement, and a function call can also be an
-	// expression)
 	| ExpressionStatement
 	| EmptyStatement;
 
@@ -35,7 +32,7 @@ ReturnStatement:
 VariableDeclaration:
 	variant=('var' | 'let' | 'const') name=IDENTIFIER (':' type=TypeExpression)? ('=' value=Expression)?;
 
-Expression: 
+Expression:
 	AssignmentExpression;
 
 AssignmentExpression:
@@ -55,7 +52,7 @@ PathExpression:
 	| PrimaryExpression;
 
 PrimaryExpression:
-	 GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis;
+	GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis;
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral;
