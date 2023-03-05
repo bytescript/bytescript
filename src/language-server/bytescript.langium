@@ -1,25 +1,58 @@
 grammar ByteScript
 
 entry ByteScriptCode:
-	statements+=Statement*;
+	statements+=TopLevelStatement*;
+
+TopLevelStatement:
+	ExportStatement
+	| Statement;
+
+ExportStatement:
+	"export" statement=DeclarationStatement ";"?;
+
+DeclarationStatement:
+	VariableDeclaration | ClassicFunction<true>;
 
 Statement:
 	VariableDeclaration
 	| ClassicFunction<true>
-	// For now, a function call is a statement (but later we'll want to allow
-	// any expression to be a statement, and a function call can also be an
-	// expression)
-	| FunctionCall;
+	| ReturnStatement
+	| ExpressionStatement
+	| EmptyStatement;
+
+EmptyStatement:
+	empty?=";"+;
+
+ExpressionStatement:
+	expression=Expression ";"?;
+
+ReturnStatement:
+	"return" expression=Expression ";"?;
 
 VariableDeclaration:
 	variant=('var' | 'let' | 'const') name=IDENTIFIER (':' type=TypeExpression)? ('=' value=Expression)?;
 
 Expression:
-	NumberLiteral
-	| Identifier
-	// Disable for now, we don't support passing around lambdas yet.
-	// | ClassicFunction<false>
-;
+	AssignmentExpression;
+
+AssignmentExpression:
+	Identifier ({infer BinaryExpression.lhs=current} op="=" rhs=SumExpression)*
+	| SumExpression;
+
+SumExpression:
+	ProductExpression ({infer BinaryExpression.lhs=current} op=("+" | "-") rhs=ProductExpression)*;
+
+ProductExpression:
+	PathExpression ({infer BinaryExpression.lhs=current} op=("*" | "/") rhs=PathExpression)*;
+
+PathExpression:
+	Identifier (
+		{infer CallExpression.callee=current} "(" (args+=Expression ("," args+=Expression)* ","? )? ")"
+	)*
+	| PrimaryExpression;
+
+PrimaryExpression:
+	GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis;
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral;
@@ -29,6 +62,12 @@ FloatLiteral:
 
 IntegerLiteral:
 	value=INT;
+
+GroupLiteral:
+	"(" value=Expression ")";
+
+InvalidParenthesis:
+	empty?="(" ")";
 
 Identifier:
 	value=IDENTIFIER;
@@ -42,15 +81,6 @@ ClassicFunction<nameRequired>:
 Param:
 	name=IDENTIFIER (':' type=TypeExpression)?;
 
-FunctionCall:
-	name=IDENTIFIER '('
-		( args+=CallArgs (',' args+=CallArgs)* )?
-	')';
-
-// Normally function args can be any Expression, but for now we are limiting it
-// to numbers or variables only.
-CallArgs:
-	NumberLiteral | Identifier;
 
 fragment Block:
 	'{' body+=Statement* '}';
