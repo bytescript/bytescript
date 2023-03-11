@@ -9,6 +9,10 @@
 type i32 = number;
 type f64 = number;
 
+import { xxh3 } from "./src/hash.bs";
+
+export { xxh3 } from "./src/hash.bs";
+
 function foo1(bar: i32): f64 {
 }
 

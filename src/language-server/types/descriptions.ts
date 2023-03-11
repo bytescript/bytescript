@@ -1,5 +1,5 @@
 import type { AstNode } from "langium";
-import type { NumberLiteral } from "../generated/ast";
+import type { Identifier, NumberLiteral, TypeExpression } from "../generated/ast";
 
 export type TypeDescription =
 	NumberType
@@ -82,6 +82,26 @@ export function createF64NumberType(literal?: NumberLiteral): F64NumberType {
 
 export function isF64NumberType(item: TypeDescription): item is F64NumberType {
 	return item.$type === "f64";
+}
+
+// type
+
+export interface TypeDeclaration {
+	readonly $type: "type";
+	readonly name?: Identifier;
+	readonly value?: TypeExpression;
+}
+
+export function createTypeDeclaration(name: Identifier, value: TypeExpression): TypeDeclaration {
+	return {
+		$type: "type",
+		name,
+		value
+	};
+}
+
+export function isTypeDeclaration(item: TypeDeclaration): item is TypeDeclaration {
+	return item.$type === "type";
 }
 
 // function
