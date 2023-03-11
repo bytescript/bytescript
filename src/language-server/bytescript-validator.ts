@@ -8,7 +8,6 @@ import {
 	InvalidParenthesis,
 	ReturnStatement,
 	isReturnStatement,
-	TypeExpression,
 } from "./generated/ast";
 import type { ByteScriptServices } from "./bytescript-module";
 import { getType, isAssignable } from "./types/types";
