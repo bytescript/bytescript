@@ -1,17 +1,14 @@
 grammar ByteScript
 
 entry ByteScriptCode:
-	statements+=TopLevelStatement*;
-
-TopLevelStatement:
-	ExportStatement
-	| Statement;
-
-ExportStatement:
-	"export" statement=DeclarationStatement ";"?;
+	statements+=Statement*
+	declarations+=DeclarationStatement*;
 
 DeclarationStatement:
-	VariableDeclaration | ClassicFunction<true>;
+	VariableDeclaration
+	| ClassicFunction<true>
+	| ImportDeclaration
+	| ExportDeclaration;
 
 Statement:
 	VariableDeclaration
@@ -20,18 +17,42 @@ Statement:
 	| ExpressionStatement
 	| EmptyStatement;
 
+// DECLARATION
+
+// import { foo as bar } from "path";
+ImportDeclaration:
+    "import" "{" (declarators+=ImportDeclarator ("," declarators+=ImportDeclarator)*)? "}" "from" path=STRING ";";
+
+// foo as bar
+ImportDeclarator:
+    name=Identifier ("as" alias=Identifier)?;
+
+// export { foo as bar } from "path";
+ExportDeclaration:
+    "export" "{" declarators+=ExportDeclarator ("," declarators+=ExportDeclarator)* "}";
+
+// foo as bar
+ExportDeclarator:
+    name=Identifier ("as" alias=Identifier)?;
+
+// [var | let | const] foo: f32 = 3.14;
+VariableDeclaration:
+	variant=("var" | "let" | "const") name=IDENTIFIER (":" type=TypeExpression)? ("=" value=Expression)?;
+
+// STATEMENT
+
+// Empty
 EmptyStatement:
 	empty?=";"+;
 
 ExpressionStatement:
 	expression=Expression ";"?;
 
+// return foo;
 ReturnStatement:
 	"return" expression=Expression ";"?;
 
-VariableDeclaration:
-	variant=("var" | "let" | "const") name=IDENTIFIER (":" type=TypeExpression)? ("=" value=Expression)?;
-
+// EXPRESSION
 Expression:
 	AssignmentExpression;
 
@@ -72,18 +93,22 @@ InvalidParenthesis:
 Identifier:
 	value=IDENTIFIER;
 
-// Classic js `function`
 ClassicFunction<nameRequired>:
 	"function" (<nameRequired> name=IDENTIFIER | <!nameRequired> name=IDENTIFIER?) "("
-		( params+=Param ("," params+=Param)* )?
+		( params+=Parameter ("," params+=Parameter)* )?
 	")" (":" returnType=TypeExpression)? Block;
 
-Param:
+Parameter:
 	name=IDENTIFIER (":" type=TypeExpression)?;
-
 
 fragment Block:
 	"{" body+=Statement* "}";
+
+fragment Parameters:
+    "(" (parameters+=Parameter ("," parameters+=Parameter)*)? ")";
+
+fragment ReturnType:
+    returnType=TypeExpression;
 
 TypeExpression:
 	primitive=("number" | "i32" | "f32" | "f64");
