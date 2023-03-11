@@ -13,6 +13,12 @@ import { xxh3 } from "./src/hash.bs";
 
 export { xxh3 } from "./src/hash.bs";
 
+export {
+	foo1,
+	foo2,
+	foo3
+}
+
 function foo1(bar: i32): f64 {
 }
 
@@ -20,7 +26,7 @@ function foo2(bar: i32): f64 {
 	return 3.14;
 }
 
-function foo4(bar: i32): f64 {
+function foo3(bar: i32): f64 {
 	return 2;
 }
 
