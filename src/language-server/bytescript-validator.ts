@@ -1,4 +1,4 @@
-import type {AstNode, ValidationAcceptor, ValidationChecks} from "langium";
+import type { AstNode, ValidationAcceptor, ValidationChecks } from "langium";
 import {
 	ByteScriptAstType,
 	ClassicFunction,
@@ -6,10 +6,13 @@ import {
 	CallExpression,
 	isIdentifier,
 	InvalidParenthesis,
+	ReturnStatement,
+	isReturnStatement,
+	TypeExpression,
 } from "./generated/ast";
-import type {ByteScriptServices} from "./bytescript-module";
-import {getType, isAssignable} from "./types/types";
-import {isErrorType, TypeDescription, typeToString} from "./types/descriptions";
+import type { ByteScriptServices } from "./bytescript-module";
+import { getType, isAssignable } from "./types/types";
+import { isErrorType, TypeDescription, typeToString } from "./types/descriptions";
 
 /**
  * Register custom validation checks.
@@ -46,7 +49,7 @@ export class ByteScriptValidator {
 						accept(
 							"error",
 							`Type '${typeToString(valueType)}' is not assignable to type '${typeToString(declType)}'.`,
-							{node: varDecl, property: "value"},
+							{ node: varDecl, property: "value" },
 						);
 					}
 				} else {
@@ -61,9 +64,28 @@ export class ByteScriptValidator {
 		}
 	}
 
-	checkClassicFunction(func: ClassicFunction, accept: ValidationAcceptor): void {
-		const type = getType(func);
-		if (acceptErrorType(func, type, accept)) return;
+	checkClassicFunction(node: ClassicFunction, accept: ValidationAcceptor): void {
+		const type = getType(node);
+		const returnType = getType(node.returnType!);
+		let returnStmt: ReturnStatement | null = null;
+		for (const member of node.body) if (isReturnStatement(member)) returnStmt = member;
+		if (!node.returnType!) {
+			if (returnStmt) {
+				// TODO: Infer function return type from return value expression
+			}
+		} else if (!returnStmt) {
+			accept("error", "A function whose declared type is not 'void' must return a value", { node: node.returnType! });
+		} else {
+			const returnStmtType = getType(returnStmt!);
+			if (!isAssignable(returnType, returnStmtType)) {
+				accept(
+					"error",
+					`Type '${typeToString(returnType)}' is not assignable to type '${typeToString(returnStmtType)}'.`,
+					{ node: returnStmt },
+				);
+			}
+		}
+		if (acceptErrorType(node, type, accept)) return;
 	}
 
 	checkCallExpression(call: CallExpression, accept: ValidationAcceptor) {
@@ -71,19 +93,19 @@ export class ByteScriptValidator {
 			const identifier = call.callee;
 			const char = identifier.value.charAt(0);
 			if (char.toLowerCase() !== char) {
-				accept("error", "FunctionCall: Expected lower case name.", {node: call, property: "callee"});
+				accept("error", "FunctionCall: Expected lower case name.", { node: call, property: "callee" });
 			}
 		}
 	}
 
 	checkInvalidParenthesis(expression: InvalidParenthesis, accept: ValidationAcceptor) {
-		accept("error", "SyntaxError: Expected expression.", {node: expression});
+		accept("error", "SyntaxError: Expected expression.", { node: expression });
 	}
 }
 
 function acceptErrorType(node: AstNode, type: TypeDescription, accept: ValidationAcceptor): boolean {
 	if (isErrorType(type)) {
-		accept("error", type.message, {node});
+		accept("error", type.message, { node });
 		return true;
 	}
 

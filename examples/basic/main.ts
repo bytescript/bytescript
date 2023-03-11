@@ -6,20 +6,18 @@
 
 /////////////////////////////////////////////////////////
 // Testing Code ////////////////////////////////////////
+type i32 = number;
+type f64 = number;
 
-function foo(foo: i32): f64 {
-	/**
-	 * This is a var
-	 */
-	let foo = 456
+function foo1(bar: i32): f64 {
+}
 
-	return 1.2;
-	return 1;
-	return (1 + 4);
-	return (Foo() * bar());
+function foo2(bar: i32): f64 {
+	return 3.14;
+}
 
-	return
-	(foo() * bar()); // should be an unreachable code error
+function foo4(bar: i32): f64 {
+	return 2;
 }
 
 /**
