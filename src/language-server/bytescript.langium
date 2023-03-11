@@ -8,7 +8,8 @@ DeclarationStatement:
 	VariableDeclaration
 	| ClassicFunction<true>
 	| ImportDeclaration
-	| ExportDeclaration;
+	| ExportDeclaration
+	| TypeDeclaration;
 
 Statement:
 	VariableDeclaration
@@ -18,6 +19,10 @@ Statement:
 	| EmptyStatement;
 
 // DECLARATION
+
+// type foo = i32;
+TypeDeclaration:
+	"type" name=Identifier "=" value=TypeExpression;
 
 // import { foo as bar } from "path";
 ImportDeclaration:
@@ -29,7 +34,7 @@ ImportDeclarator:
 
 // export { foo as bar } from "path";
 ExportDeclaration:
-    "export" "{" declarators+=ExportDeclarator ("," declarators+=ExportDeclarator)* "}";
+    "export" "{" (declarators+=ExportDeclarator ("," declarators+=ExportDeclarator)*)? "}";
 
 // foo as bar
 ExportDeclarator:
