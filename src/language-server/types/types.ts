@@ -3,12 +3,15 @@ import {
 	isClassicFunction,
 	isFloatLiteral,
 	isIntegerLiteral,
+	isReturnStatement,
 	isTypeExpression,
 	isVariableDeclaration,
+	ReturnStatement,
 	TypeExpression,
 } from "../generated/ast";
 import {
 	createErrorType,
+	createF64NumberType,
 	createFunctionType,
 	createI32NumberType,
 	createLiteralNumberType,
@@ -28,11 +31,13 @@ export function getType(node: AstNode): TypeDescription {
 	let type: TypeDescription | null = null;
 
 	if (isFloatLiteral(node)) {
-		type = new F64NumberType(node);
+		type = createF64NumberType(node);
 	} else if (isIntegerLiteral(node)) {
 		type = createI32NumberType(node);
 	} else if (isTypeExpression(node)) {
 		type = inferTypeExpression(node);
+	} else if (isReturnStatement(node)) {
+		type = getType(node.expression);
 	} else if (isVariableDeclaration(node)) {
 		if (node.type) {
 			type = getType(node.type);
