@@ -109,10 +109,10 @@ fragment Block:
 	"{" body+=Statement* "}";
 
 fragment Parameters:
-    "(" (parameters+=Parameter ("," parameters+=Parameter)*)? ")";
+	"(" (parameters+=Parameter ("," parameters+=Parameter)*)? ")";
 
 fragment ReturnType:
-    returnType=TypeExpression;
+	returnType=TypeExpression;
 
 TypeExpression:
 	primitive=("number" | "i32" | "f32" | "f64");
