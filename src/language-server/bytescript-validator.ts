@@ -11,7 +11,7 @@ import {
 } from './generated/ast'
 import type {ByteScriptServices} from './bytescript-module'
 import {getType, isAssignable} from './types/types'
-import {isErrorType, TypeDescription, typeToString} from './types/descriptions'
+import {TypeInferenceError, isTypeInferenceError, TypeDescription, typeToString} from './types/descriptions'
 
 /**
  * Register custom validation checks.
@@ -35,13 +35,13 @@ export class ByteScriptValidator {
 	checkVarDeclaration(varDecl: VariableDeclaration, accept: ValidationAcceptor): void {
 		const declType = getType(varDecl)
 
-		if (acceptErrorType(varDecl, declType, accept)) return
+		if (maybeAcceptTypeInferenceError(varDecl, declType, accept)) return
 
 		if (varDecl.type || varDecl.value) {
 			if (varDecl.value) {
 				const valueType = getType(varDecl.value)
 
-				if (acceptErrorType(varDecl.value, valueType, accept)) return
+				if (maybeAcceptTypeInferenceError(varDecl.value, valueType, accept)) return
 
 				if (varDecl.type) {
 					if (!isAssignable(valueType, declType)) {
@@ -65,10 +65,14 @@ export class ByteScriptValidator {
 
 	checkClassicFunction(node: ClassicFunction, accept: ValidationAcceptor): void {
 		const type = getType(node)
+		maybeAcceptTypeInferenceError(node, type, accept)
+
 		const returnType = getType(node.returnType!)
+		maybeAcceptTypeInferenceError(node, type, accept)
+
 		let returnStmt: ReturnStatement | null = null
 		for (const member of node.body) if (isReturnStatement(member)) returnStmt = member
-		if (!node.returnType!) {
+		if (!node.returnType) {
 			if (returnStmt) {
 				// TODO: Infer function return type from return value expression
 			}
@@ -76,6 +80,8 @@ export class ByteScriptValidator {
 			accept('error', "A function whose declared type is not 'void' must return a value", {node: node.returnType!})
 		} else {
 			const returnStmtType = getType(returnStmt!)
+			maybeAcceptTypeInferenceError(node, type, accept)
+
 			if (!isAssignable(returnType, returnStmtType)) {
 				accept(
 					'error',
@@ -84,7 +90,6 @@ export class ByteScriptValidator {
 				)
 			}
 		}
-		if (acceptErrorType(node, type, accept)) return
 	}
 
 	checkCallExpression(call: CallExpression, accept: ValidationAcceptor) {
@@ -102,8 +107,12 @@ export class ByteScriptValidator {
 	}
 }
 
-function acceptErrorType(node: AstNode, type: TypeDescription, accept: ValidationAcceptor): boolean {
-	if (isErrorType(type)) {
+function maybeAcceptTypeInferenceError(
+	node: AstNode,
+	type: TypeDescription,
+	accept: ValidationAcceptor,
+): type is TypeInferenceError {
+	if (isTypeInferenceError(type)) {
 		accept('error', type.message, {node})
 		return true
 	}

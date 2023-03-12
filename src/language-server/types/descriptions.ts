@@ -1,7 +1,7 @@
 import type {AstNode} from 'langium'
 import type {Identifier, NumberLiteral, TypeExpression} from '../generated/ast'
 
-export type TypeDescription = NumberType | FunctionType | ErrorType
+export type TypeDescription = NumberType | FunctionType | TypeInferenceError
 
 type NumberType = LiteralNumberType | I32NumberType | F64NumberType | F32NumberType
 
@@ -126,13 +126,13 @@ export function isFunctionType(item: TypeDescription): item is FunctionType {
 
 // error
 
-export interface ErrorType {
+export interface TypeInferenceError {
 	readonly $type: 'error'
 	readonly source?: AstNode
 	readonly message: string
 }
 
-export function createErrorType(message: string, source?: AstNode): ErrorType {
+export function createTypeInferenceError(message: string, source?: AstNode): TypeInferenceError {
 	return {
 		$type: 'error',
 		message,
@@ -140,7 +140,7 @@ export function createErrorType(message: string, source?: AstNode): ErrorType {
 	}
 }
 
-export function isErrorType(item: TypeDescription): item is ErrorType {
+export function isTypeInferenceError(item: TypeDescription): item is TypeInferenceError {
 	return item.$type === 'error'
 }
 

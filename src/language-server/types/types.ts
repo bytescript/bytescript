@@ -9,7 +9,7 @@ import {
 	TypeExpression,
 } from '../generated/ast'
 import {
-	createErrorType,
+	createTypeInferenceError,
 	createF64NumberType,
 	createFunctionType,
 	createI32NumberType,
@@ -24,7 +24,7 @@ export function getType(node: AstNode): TypeDescription {
 	if (types.has(node)) return types.get(node)!
 
 	// Prevent recursive inference errors
-	types.set(node, createErrorType('Recursive definition', node))
+	types.set(node, createTypeInferenceError('Recursive definition', node))
 
 	let type: TypeDescription | null = null
 
@@ -42,17 +42,17 @@ export function getType(node: AstNode): TypeDescription {
 		} else if (node.value) {
 			type = getType(node.value)
 		} else {
-			type = createErrorType('All variable declarations need values for now', node)
+			type = createTypeInferenceError('All variable declarations need values for now', node)
 		}
 	} else if (isClassicFunction(node)) {
 		if (!node.returnType) {
-			type = createErrorType('No return type inference yet (use a return type annotation)', node)
+			type = createTypeInferenceError('No return type inference yet (use a return type annotation)', node)
 		} else {
 			const paramTypes: FunctionParameter[] = []
 
 			for (const param of node.params) {
 				if (!param.type) {
-					type = createErrorType(
+					type = createTypeInferenceError(
 						'Parameter types not inferred from call sites yet (use parameter type annotations)',
 						node,
 					)
@@ -70,7 +70,7 @@ export function getType(node: AstNode): TypeDescription {
 			if (!type) type = createFunctionType(paramTypes, getType(node.returnType))
 		}
 	} else {
-		type = createErrorType('Could not infer type for ' + node.$type, node)
+		type = createTypeInferenceError('Could not infer type for ' + node.$type, node)
 	}
 
 	types.set(node, type)
@@ -82,7 +82,7 @@ function inferTypeExpression(node: TypeExpression): TypeDescription {
 	if (node.primitive === 'number') return createLiteralNumberType()
 	else if (node.primitive === 'i32') return createI32NumberType()
 	else if (node.primitive === 'f64') return createF64NumberType()
-	else return createErrorType('Only `number`, `i32`, and `f64` types supported for now', node)
+	else return createTypeInferenceError('Only `number`, `i32`, and `f64` types supported for now', node)
 }
 
 export function isAssignable(from: TypeDescription, to: TypeDescription): boolean {
