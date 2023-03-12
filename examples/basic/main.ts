@@ -6,8 +6,8 @@
 
 /////////////////////////////////////////////////////////
 // Testing Code ////////////////////////////////////////
-type i32 = number;
-type f64 = number;
+type Foo = number;
+type Bar = number;
 
 import { xxh3 } from "./src/hash.bs";
 
@@ -28,6 +28,10 @@ function foo2(bar: i32): f64 {
 
 function foo3(bar: i32): f64 {
 	return 2;
+}
+
+function foo3(bar: i32): i32 {
+	return 2.0;
 }
 
 /**
@@ -84,7 +88,7 @@ function baz(a: f64, b: f64) { }
 // error missing parameter type annotation (no callsite generic inference yet)
 function baz(a: f64, b): i32 { }
 
-function () {} // error 
+function () {} // error
 
 // totally bad top level syntax
 const d Car = 2
