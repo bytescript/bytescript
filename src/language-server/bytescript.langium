@@ -5,7 +5,7 @@ entry ByteScriptCode:
 
 TopLevelStatement:
 	ImportDeclaration
-	| ExportDeclaration
+	| ExportSpecifier
 	| TypeDeclaration
 	| Statement;
 
@@ -22,18 +22,18 @@ Statement:
 TypeDeclaration:
 	"type" name=Identifier "=" value=TypeExpression ";"?;
 
-// import { foo as bar } from "path";
+// import { foo as bar } from "specifier";
 ImportDeclaration:
-	"import" "{" (declarators+=ImportDeclarator ("," declarators+=ImportDeclarator)*)? "}" "from" path=STRING ";"?;
+	"import" "{" (bindings+=ImportSpecifier ("," bindings+=ImportSpecifier)*)? "}" "from" specifier=STRING ";"?;
 
 // foo as bar
-ImportDeclarator:
+ImportSpecifier:
 	name=Identifier ("as" alias=Identifier)?;
 
-// export { foo as bar } from "path";
+// export { foo as bar } from "specifier";
 // export { foo, bar }
-ExportDeclaration:
-	"export" "{" (declarators+=ExportDeclarator ("," declarators+=ExportDeclarator)*)? "}" ("from" path=STRING)? ";"?;
+ExportSpecifier:
+	"export" "{" (bindings+=ExportDeclarator ("," bindings+=ExportDeclarator)*)? "}" ("from" specifier=STRING)? ";"?;
 
 // foo as bar
 ExportDeclarator:
