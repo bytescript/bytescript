@@ -26,20 +26,20 @@ TypeDeclaration:
 
 // import { foo as bar } from "path";
 ImportDeclaration:
-    "import" "{" (declarators+=ImportDeclarator ("," declarators+=ImportDeclarator)*)? "}" "from" path=STRING ";"?;
+	"import" "{" (declarators+=ImportDeclarator ("," declarators+=ImportDeclarator)*)? "}" "from" path=STRING ";"?;
 
 // foo as bar
 ImportDeclarator:
-    name=Identifier ("as" alias=Identifier)?;
+	name=Identifier ("as" alias=Identifier)?;
 
 // export { foo as bar } from "path";
 // export { foo, bar }
 ExportDeclaration:
-    "export" "{" (declarators+=ExportDeclarator ("," declarators+=ExportDeclarator)*)? "}" ("from" path=STRING)? ";"?;
+	"export" "{" (declarators+=ExportDeclarator ("," declarators+=ExportDeclarator)*)? "}" ("from" path=STRING)? ";"?;
 
 // foo as bar
 ExportDeclarator:
-    name=Identifier ("as" alias=Identifier)?;
+	name=Identifier ("as" alias=Identifier)?;
 
 // [var | let | const] foo: f32 = 3.14;
 VariableDeclaration:
