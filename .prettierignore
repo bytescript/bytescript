@@ -1,3 +1,6 @@
 node_modules/
 out/
 package-lock.json
+
+# Ignore examples for now because they have syntax errors we're testing, prettier can't parse them.
+examples/

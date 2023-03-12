@@ -48,7 +48,7 @@
 		"vscode:prepublish": "npm run build && npm run lint",
 		"build": "tsc -b tsconfig.json",
 		"watch": "tsc -b tsconfig.json --watch",
-		"lint": "eslint src --ext ts",
+		"lint": "prettier . --check && eslint src --ext ts",
 		"langium:generate": "langium generate",
 		"langium:watch": "langium generate --watch",
 		"format:all": "prettier --write ."
