@@ -1,15 +1,13 @@
 grammar ByteScript
 
 entry ByteScriptCode:
-	statements+=Statement*
-	declarations+=DeclarationStatement*;
+	statements+=TopLevelStatement*;
 
-DeclarationStatement:
-	VariableDeclaration
-	| ClassicFunction<true>
-	| ImportDeclaration
+TopLevelStatement:
+	ImportDeclaration
 	| ExportDeclaration
-	| TypeDeclaration;
+	| TypeDeclaration
+	| Statement;
 
 Statement:
 	VariableDeclaration
