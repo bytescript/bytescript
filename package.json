@@ -1,7 +1,7 @@
 {
 	"name": "bytescript",
 	"displayName": "bytescript",
-	"description": "Please enter a brief description here",
+	"description": "Compile TypeScript to WebAssembly and native.",
 	"version": "0.0.0",
 	"engines": {
 		"vscode": "^1.56.0"
