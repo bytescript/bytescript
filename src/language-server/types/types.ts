@@ -1,4 +1,4 @@
-import type {AstNode} from "langium";
+import type {AstNode} from 'langium'
 import {
 	isClassicFunction,
 	isFloatLiteral,
@@ -7,7 +7,7 @@ import {
 	isTypeExpression,
 	isVariableDeclaration,
 	TypeExpression,
-} from "../generated/ast";
+} from '../generated/ast'
 import {
 	createErrorType,
 	createF64NumberType,
@@ -16,75 +16,75 @@ import {
 	createLiteralNumberType,
 	FunctionParameter,
 	TypeDescription,
-} from "./descriptions";
+} from './descriptions'
 
-const types = new Map<AstNode, TypeDescription>();
+const types = new Map<AstNode, TypeDescription>()
 
 export function getType(node: AstNode): TypeDescription {
-	if (types.has(node)) return types.get(node)!;
+	if (types.has(node)) return types.get(node)!
 
 	// Prevent recursive inference errors
-	types.set(node, createErrorType("Recursive definition", node));
+	types.set(node, createErrorType('Recursive definition', node))
 
-	let type: TypeDescription | null = null;
+	let type: TypeDescription | null = null
 
 	if (isFloatLiteral(node)) {
-		type = createF64NumberType(node);
+		type = createF64NumberType(node)
 	} else if (isIntegerLiteral(node)) {
-		type = createI32NumberType(node);
+		type = createI32NumberType(node)
 	} else if (isTypeExpression(node)) {
-		type = inferTypeExpression(node);
+		type = inferTypeExpression(node)
 	} else if (isReturnStatement(node)) {
-		type = getType(node.expression);
+		type = getType(node.expression)
 	} else if (isVariableDeclaration(node)) {
 		if (node.type) {
-			type = getType(node.type);
+			type = getType(node.type)
 		} else if (node.value) {
-			type = getType(node.value);
+			type = getType(node.value)
 		} else {
-			type = createErrorType("All variable declarations need values for now", node);
+			type = createErrorType('All variable declarations need values for now', node)
 		}
 	} else if (isClassicFunction(node)) {
 		if (!node.returnType) {
-			type = createErrorType("No return type inference yet (use a return type annotation)", node);
+			type = createErrorType('No return type inference yet (use a return type annotation)', node)
 		} else {
-			const paramTypes: FunctionParameter[] = [];
+			const paramTypes: FunctionParameter[] = []
 
 			for (const param of node.params) {
 				if (!param.type) {
 					type = createErrorType(
-						"Parameter types not inferred from call sites yet (use parameter type annotations)",
+						'Parameter types not inferred from call sites yet (use parameter type annotations)',
 						node,
-					);
+					)
 
-					break;
+					break
 				}
 
 				paramTypes.push({
 					name: node.name,
 					type: getType(param.type),
-				});
+				})
 			}
 
 			// If all params have a type (no generic inference from callsites yet).
-			if (!type) type = createFunctionType(paramTypes, getType(node.returnType));
+			if (!type) type = createFunctionType(paramTypes, getType(node.returnType))
 		}
 	} else {
-		type = createErrorType("Could not infer type for " + node.$type, node);
+		type = createErrorType('Could not infer type for ' + node.$type, node)
 	}
 
-	types.set(node, type);
+	types.set(node, type)
 
-	return type;
+	return type
 }
 
 function inferTypeExpression(node: TypeExpression): TypeDescription {
-	if (node.primitive === "number") return createLiteralNumberType();
-	else if (node.primitive === "i32") return createI32NumberType();
-	else if (node.primitive === "f64") return createF64NumberType();
-	else return createErrorType("Only `number`, `i32`, and `f64` types supported for now", node);
+	if (node.primitive === 'number') return createLiteralNumberType()
+	else if (node.primitive === 'i32') return createI32NumberType()
+	else if (node.primitive === 'f64') return createF64NumberType()
+	else return createErrorType('Only `number`, `i32`, and `f64` types supported for now', node)
 }
 
 export function isAssignable(from: TypeDescription, to: TypeDescription): boolean {
-	return from.$type === to.$type;
+	return from.$type === to.$type
 }
