@@ -6,7 +6,6 @@ import {
 	isReturnStatement,
 	isTypeExpression,
 	isVariableDeclaration,
-	ReturnStatement,
 	TypeExpression,
 } from "../generated/ast";
 import {
@@ -15,7 +14,6 @@ import {
 	createFunctionType,
 	createI32NumberType,
 	createLiteralNumberType,
-	F64NumberType,
 	FunctionParameter,
 	TypeDescription,
 } from "./descriptions";
@@ -83,7 +81,7 @@ export function getType(node: AstNode): TypeDescription {
 function inferTypeExpression(node: TypeExpression): TypeDescription {
 	if (node.primitive === "number") return createLiteralNumberType();
 	else if (node.primitive === "i32") return createI32NumberType();
-	else if (node.primitive === "f64") return new F64NumberType();
+	else if (node.primitive === "f64") return createF64NumberType();
 	else return createErrorType("Only `number`, `i32`, and `f64` types supported for now", node);
 }
 
