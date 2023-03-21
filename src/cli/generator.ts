@@ -1,10 +1,10 @@
 import fs from "fs";
-import { CompositeGeneratorNode, NL, toString } from "langium";
+import {CompositeGeneratorNode, NL, toString} from "langium";
 import path from "path";
-import type { ByteScriptCode } from "../language-server/generated/ast";
-import { extractDestinationAndName } from "./cli-util";
+import type {Program} from "../language-server/generated/ast";
+import {extractDestinationAndName} from "./cli-util";
 
-export function generateJavaScript(code: ByteScriptCode, filePath: string, destination: string | undefined): string {
+export function generateJavaScript(code: Program, filePath: string, destination: string | undefined): string {
 	const data = extractDestinationAndName(filePath, destination);
 	const generatedFilePath = `${path.join(data.destination, data.name)}.js`;
 
@@ -12,7 +12,7 @@ export function generateJavaScript(code: ByteScriptCode, filePath: string, desti
 	fileNode.append('"use strict";', NL, NL);
 	code.statements.forEach(stmt => fileNode.append(`console.log('Hello, ${stmt.$type}!');`, NL));
 
-	if (!fs.existsSync(data.destination)) fs.mkdirSync(data.destination, { recursive: true });
+	if (!fs.existsSync(data.destination)) fs.mkdirSync(data.destination, {recursive: true});
 	fs.writeFileSync(generatedFilePath, toString(fileNode));
 	return generatedFilePath;
 }

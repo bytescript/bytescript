@@ -8,15 +8,17 @@
 // Testing Code ////////////////////////////////////////
 type i32 = number;
 type f64 = number;
+let foo = 2.32;
+let foo = 321;
 
-function foo1(bar: i32): f64 {
+function foo(bar: i32): f64 {
 }
 
-function foo2(bar: i32): f64 {
+function foo(bar: i32): f64 {
 	return 3.14;
 }
 
-function foo4(bar: i32): f64 {
+function bar(bar: i32): f64 {
 	return 2;
 }
 
@@ -41,7 +43,7 @@ var boat = 3;
 //   let foo = 456
 // }
 
-export function foo(foo: i32): f64 {
+function foo(foo: i32): f64 {
 	/**
 	 * This is a var
 	 */
@@ -73,11 +75,3 @@ function baz(a: f64, b: f64) { }
 
 // error missing parameter type annotation (no callsite generic inference yet)
 function baz(a: f64, b): i32 { }
-
-function () {} // error 
-
-// totally bad top level syntax
-const d Car = 2
-doSomething(foo) { // this will be ok in a class body
-	let Foo = 456
-}

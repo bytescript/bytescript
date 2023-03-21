@@ -1,6 +1,6 @@
-import type {AstNode} from "langium";
+import type { AstNode } from "langium";
 import {
-	isClassicFunction,
+	isFunctionDeclaration,
 	isFloatLiteral,
 	isIntegerLiteral,
 	isReturnStatement,
@@ -44,7 +44,7 @@ export function getType(node: AstNode): TypeDescription {
 		} else {
 			type = createErrorType("All variable declarations need values for now", node);
 		}
-	} else if (isClassicFunction(node)) {
+	} else if (isFunctionDeclaration(node)) {
 		if (!node.returnType) {
 			type = createErrorType("No return type inference yet (use a return type annotation)", node);
 		} else {
@@ -79,9 +79,9 @@ export function getType(node: AstNode): TypeDescription {
 }
 
 function inferTypeExpression(node: TypeExpression): TypeDescription {
-	if (node.primitive === "number") return createLiteralNumberType();
-	else if (node.primitive === "i32") return createI32NumberType();
-	else if (node.primitive === "f64") return createF64NumberType();
+	if (node.text === "number") return createLiteralNumberType();
+	else if (node.text === "i32") return createI32NumberType();
+	else if (node.text === "f64") return createF64NumberType();
 	else return createErrorType("Only `number`, `i32`, and `f64` types supported for now", node);
 }
 

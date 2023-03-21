@@ -1,15 +1,15 @@
 import chalk from "chalk";
-import { Command } from "commander";
-import type { ByteScriptCode } from "../language-server/generated/ast";
-import { ByteScriptLanguageMetaData } from "../language-server/generated/module";
-import { createByteScriptServices } from "../language-server/bytescript-module";
-import { extractAstNode } from "./cli-util";
-import { generateJavaScript } from "./generator";
-import { NodeFileSystem } from "langium/node";
+import {Command} from "commander";
+import type {Program} from "../language-server/generated/ast";
+import {ByteScriptLanguageMetaData} from "../language-server/generated/module";
+import {createByteScriptServices} from "../language-server/bytescript-module";
+import {extractAstNode} from "./cli-util";
+import {generateJavaScript} from "./generator";
+import {NodeFileSystem} from "langium/node";
 
 export async function generate(fileName: string, opts: GenerateOptions): Promise<void> {
 	const services = createByteScriptServices(NodeFileSystem).ByteScript;
-	const code = await extractAstNode<ByteScriptCode>(fileName, services);
+	const code = await extractAstNode<Program>(fileName, services);
 	const generatedFilePath = generateJavaScript(code, fileName, opts.destination);
 	console.log(chalk.green(`JavaScript code generated successfully: ${generatedFilePath}`));
 }

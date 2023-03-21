@@ -1,16 +1,9 @@
 import type { AstNode } from "langium";
 import type { NumberLiteral } from "../generated/ast";
 
-export type TypeDescription =
-	NumberType
-	| FunctionType
-	| ErrorType;
+export type TypeDescription = NumberType | FunctionType | ErrorType;
 
-type NumberType =
-	LiteralNumberType
-	| I32NumberType
-	| F64NumberType
-	| F32NumberType;
+type NumberType = LiteralNumberType | I32NumberType | F64NumberType | F32NumberType;
 
 // number
 
@@ -65,7 +58,6 @@ export function isF32NumberType(item: TypeDescription): item is F32NumberType {
 	return item.$type === "f32";
 }
 
-
 // f64
 
 export interface F64NumberType {
@@ -97,7 +89,7 @@ export interface FunctionParameter {
 	type: TypeDescription;
 }
 
-// export function createFunctionType(func: ClassicFunction): FunctionType {
+// export function createFunctionType(func: FunctionDeclaration): FunctionType {
 // const returnType: TypeDescription
 // const parameters: FunctionParameter[]
 export function createFunctionType(parameters: FunctionParameter[], returnType: TypeDescription): FunctionType {

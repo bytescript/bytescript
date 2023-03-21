@@ -1,6 +1,6 @@
 grammar ByteScript
 
-entry ByteScriptCode:
+entry Program:
 	statements+=TopLevelStatement*;
 
 TopLevelStatement:
@@ -11,11 +11,11 @@ ExportStatement:
 	"export" statement=DeclarationStatement ";"?;
 
 DeclarationStatement:
-	VariableDeclaration | ClassicFunction<true>;
+	VariableDeclaration | FunctionDeclaration<true>;
 
 Statement:
 	VariableDeclaration
-	| ClassicFunction<true>
+	| FunctionDeclaration<true>
 	| ReturnStatement
 	| ExpressionStatement
 	| EmptyStatement;
@@ -30,13 +30,13 @@ ReturnStatement:
 	"return" expression=Expression ";"?;
 
 VariableDeclaration:
-	variant=("var" | "let" | "const") name=IDENTIFIER (":" type=TypeExpression)? ("=" value=Expression)?;
+	(mutable?=("let" | "var") | "const") name=IDENTIFIER (":" type=TypeExpression)? ("=" value=Expression)?;
 
 Expression:
 	AssignmentExpression;
 
 AssignmentExpression:
-	Identifier ({infer BinaryExpression.lhs=current} op="=" rhs=SumExpression)*
+	IdentifierExpression ({infer BinaryExpression.lhs=current} op="=" rhs=SumExpression)*
 	| SumExpression;
 
 SumExpression:
@@ -46,13 +46,13 @@ ProductExpression:
 	PathExpression ({infer BinaryExpression.lhs=current} op=("*" | "/") rhs=PathExpression)*;
 
 PathExpression:
-	Identifier (
+	IdentifierExpression (
 		{infer CallExpression.callee=current} "(" (args+=Expression ("," args+=Expression)* ","? )? ")"
 	)*
 	| PrimaryExpression;
 
 PrimaryExpression:
-	GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis;
+	GroupLiteral | IdentifierExpression | NumberLiteral | InvalidParenthesis;
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral;
@@ -69,24 +69,23 @@ GroupLiteral:
 InvalidParenthesis:
 	empty?="(" ")";
 
-Identifier:
-	value=IDENTIFIER;
+IdentifierExpression:
+	text=IDENTIFIER;
 
 // Classic js `function`
-ClassicFunction<nameRequired>:
+FunctionDeclaration<nameRequired>:
 	"function" (<nameRequired> name=IDENTIFIER | <!nameRequired> name=IDENTIFIER?) "("
-		( params+=Param ("," params+=Param)* )?
-	")" (":" returnType=TypeExpression)? Block;
+		( params+=Parameter ("," params+=Parameter)* )?
+	")" (":" returnType=TypeExpression)? body=BlockStatement;
 
-Param:
+Parameter:
 	name=IDENTIFIER (":" type=TypeExpression)?;
 
-
-fragment Block:
-	"{" body+=Statement* "}";
+BlockStatement:
+	"{" statements+=Statement* "}";
 
 TypeExpression:
-	primitive=("number" | "i32" | "f32" | "f64");
+	text=IDENTIFIER;
 
 // Convention: terminals are named in all caps.
 hidden terminal WS: /\s+/;
