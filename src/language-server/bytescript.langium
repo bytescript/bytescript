@@ -19,7 +19,10 @@ Statement:
 Declaration:
 	VariableDeclaration
 	| FunctionDeclaration
-	| ClassDeclaration;
+	| ClassDeclaration
+	| TypeDeclaration
+	| EnumDeclaration
+	| NamespaceDeclaration;
 
 Expression:
 	AssignmentExpression
@@ -30,10 +33,6 @@ ExpressionStatement:
 
 VariableDeclaration:
 	(mutable?=("let" | "var") | "const") name=ID (":" type=TypeExpression)? ("=" value=Expression)?;
-
-TypeDeclarationStatement:
-	Decorators Export "type" name=ID "=" type=TypeExpression ";";
-
 FunctionDeclaration:
 	Decorators Export "function" GenericParameters (name=ID)? Parameters (":" returnType=TypeExpression)? block=BlockStatement;
 
@@ -57,6 +56,18 @@ SetterClassMember:
 
 ConstructorClassMember:
 	Decorators (private?="private")? "constructor" Parameters block=BlockStatement;
+
+TypeDeclaration:
+	Decorators Export "type" name=ID "=" type=TypeExpression ";";
+
+EnumDeclaration:
+	Decorators Export "enum" name=ID "{" members+=EnumDeclarator ("," members+=EnumDeclarator)* "}";
+
+NamespaceDeclaration:
+	Decorators Export "namespace" name=ID "{" members+=Statement* "}";
+
+EnumDeclarator:
+	name=ID ("=" value=IntegerLiteral)?;
 
 WhileStatement:
 	"while" "(" condition=Expression ")" statement=Statement;
