@@ -1,5 +1,5 @@
 import { AstNode } from "langium";
-import { isFunctionDeclaration, isVariableDeclaration } from "./language-server/generated/ast";
+import { isFunctionDeclaration, isVariableStatement } from "./language-server/generated/ast";
 
 export class Scope {
     public nodes = new Map<string, AstNode>();
@@ -8,7 +8,6 @@ export class Scope {
         if (this.nodes.has(name)) {
             // VariableDeclaration and TypeDeclarations can exist together.
             // Only fail when there are two of the same declaration type.
-
             // TODO: TypeDeclaration and VariableExpression can co-exist together.
             return false;
         } else {
@@ -17,15 +16,17 @@ export class Scope {
         }
     }
     has(name: string): boolean {
+        // Recursively searches scopes in reverse to make sure that the parent does not have scope name.
         return this.nodes.has(name) || this.parentScope?.has(name) || false;
     }
     get(name: string): AstNode | null {
-        return this.nodes.has(name) ? this.nodes.get(name)! : null;
+        // Get from parent scope
+        return this.nodes.get(name) || this.parentScope?.get(name) || null;
     }
 }
 
 export function isScopeType(node: AstNode): boolean {
-    if (isVariableDeclaration(node)) {
+    if (isVariableStatement(node)) {
         return true;
     } else if (isFunctionDeclaration(node)) {
         return true;
@@ -34,7 +35,7 @@ export function isScopeType(node: AstNode): boolean {
 }
 
 export function getNameOfNode(node: AstNode): string | null {
-    if (isVariableDeclaration(node)) {
+    if (isVariableStatement(node)) {
         return node.name;
     } else if (isFunctionDeclaration(node)) {
         return node.name!;

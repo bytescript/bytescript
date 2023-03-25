@@ -5,7 +5,7 @@ import {
 	isIntegerLiteral,
 	isReturnStatement,
 	isTypeExpression,
-	isVariableDeclaration,
+	isVariableStatement,
 	TypeExpression,
 } from "../generated/ast";
 import {
@@ -36,7 +36,7 @@ export function getType(node: AstNode): TypeDescription {
 		type = inferTypeExpression(node);
 	} else if (isReturnStatement(node)) {
 		type = getType(node.expression);
-	} else if (isVariableDeclaration(node)) {
+	} else if (isVariableStatement(node)) {
 		if (node.type) {
 			type = getType(node.type);
 		} else if (node.value) {

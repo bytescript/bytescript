@@ -10,12 +10,13 @@ Statement:
 	Declaration
 	| WhileStatement
 	| ForStatement
-	| IfStatement
+	| IfElseStatement
 	| ReturnStatement
+	| BlockStatement
 	| EmptyStatement;
 
 Declaration:
-	VariableDeclaration
+	VariableStatement
 	| FunctionDeclaration
 	| ClassDeclaration
 	| TypeDeclaration
@@ -25,19 +26,27 @@ Declaration:
 Expression:
 	FunctionCallExpression
 	| AssignmentExpression
-	| TernaryExpression;
+	| TernaryExpression
+	| ArrowFunction
+	| DoExpression;
 
 ExpressionStatement:
 	Expression;
 
-VariableDeclaration:
+DoExpression:
+	"do" contents=BlockStatement;
+
+IfElseStatement:
+	"if" "(" condition=Expression ")" truthy=Statement ("else" falsy=Statement)?;
+
+VariableStatement:
 	(mutable?=("let" | "var") | "const") name=ID (":" type=TypeExpression)? "=" value=Expression;
 
 FunctionDeclaration:
-	"function" GenericParameters? name=ID Parameters (":" returnType=TypeExpression)? body=BlockStatement;
+	Decorators "function" GenericParameters? name=ID Parameters (":" returnType=TypeExpression)? body=BlockStatement;
 
 ClassDeclaration:
-	"class" name=ID GenericParameters? ("extends" extends=TypeExpression)? "{" members+=ClassMember* "}";
+	Decorators "class" name=ID GenericParameters? ("extends" extends=TypeExpression)? "{" members+=ClassMember* "}";
 
 ClassMember:
 	ConstructorClassMember | FieldClassMember | MethodClassMember | GetterClassMember | SetterClassMember;
@@ -72,14 +81,14 @@ EnumDeclarator:
 WhileStatement:
 	"while" "(" condition=Expression ")" statement=Statement;
 
-ForStatement: 
+ForStatement:
 	"for" "(" conditions+=Expression* ";" (conditions+=Expression*)? ")" statement=Statement;
 
-IfStatement:
-	"if" "(" condition=ExpressionStatement ")" statement=Statement;
+ArrowFunction:
+	Parameters ":" (returnType=TypeExpression)? "=>" body=Statement;
 
 FunctionCallExpression:
-	name=ID "(" args+=NumberLiteral | Identifier ("," args+=NumberLiteral | Identifier)? ")";
+	name=ID "(" (args+=NumberLiteral | Identifier)? ("," args+=NumberLiteral | Identifier)? ")";
 
 TernaryExpression:
 	condition=AssignmentExpression "?" truthy=ExpressionStatement ":" falsy=ExpressionStatement;
@@ -137,7 +146,7 @@ TypeExpression:
 	NamedTypeExpression;
 
 NamedTypeExpression:
-    name=ID TypeParameters;
+	name=ID TypeParameters;
 
 Decorator:
 	"@" name=ID CallParameters?;
@@ -152,11 +161,11 @@ fragment CallParameters:
 	"(" (parameters+=Expression ("," parameters+=Expression)*)? ")";
 
 fragment TypeParameters:
-    ("<" typeParameters+=TypeExpression ("," typeParameters+=TypeExpression)* ">")?;
-  
+	("<" typeParameters+=TypeExpression ("," typeParameters+=TypeExpression)* ">")?;
+
 fragment GenericParameters:
 	("<" typeParameters+=Identifier ("," typeParameters+=Identifier* ">")?);
- 
+
 fragment Parameters:
 	"(" (parameters+=Parameter ("," parameters+=Parameter)*)? ")";
 

@@ -44,11 +44,12 @@ var boat = 3
 //   let foo = 456
 // }
 
-class Vec3 {
-	x: f64 = 0
-	y: f64 = 0
-	z: f64 = 0
+class Vec3<A, B> {
+	public x: f64 = 0
+	public y: f64 = 0
+	private z: f64 = 0
 	constructor(x: f64, y: f64, z: f64) {}
+	set x
 }
 
 class Player extends Vec3 {}

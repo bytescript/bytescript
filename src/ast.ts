@@ -9,7 +9,7 @@ import {
     NumberLiteral,
     Parameter,
     TypeExpression,
-    VariableDeclaration,
+    VariableStatement,
     FunctionCallExpression,
 } from "./language-server/generated/ast";
 
@@ -104,14 +104,14 @@ export abstract class Node {
         };
     }
 
-    static createVariableDeclaration(
+    static createVariableStatement(
         name: string,
         mutable: boolean,
         type: TypeExpression | null = null,
         value: Expression | null = null,
-    ): VariableDeclaration {
+    ): VariableStatement {
         if (!type && !value) {
-            throw new Error("Cannot create variable declaration if both type and value are not supplied.");
+            throw new Error("Cannot create variable statement if both type and value are not supplied.");
         } else if (value) {
             //type = getType(value);
         }
