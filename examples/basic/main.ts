@@ -10,11 +10,12 @@ type i32 = number;
 type f64 = number;
 let foo = 2.32;
 let foo = 321;
-
 function foo(bar: i32): f64 {
 }
 
 function foo(bar: i32): f64 {
+	let boo = 123;
+	let boo = 123;
 	return 3.14;
 }
 

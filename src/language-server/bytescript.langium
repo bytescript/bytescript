@@ -4,36 +4,83 @@ entry Program:
 	statements+=TopLevelStatement*;
 
 TopLevelStatement:
-	ExportStatement
-	| Statement;
-
-ExportStatement:
-	"export" statement=DeclarationStatement ";"?;
-
-DeclarationStatement:
-	VariableDeclaration | FunctionDeclaration<true>;
+	Statement;
 
 Statement:
-	VariableDeclaration
-	| FunctionDeclaration<true>
+	Declaration
+	| WhileStatement
+	| ForStatement
+	| IfStatement
 	| ReturnStatement
 	| ExpressionStatement
-	| EmptyStatement;
+	| EmptyStatement
+	";";
 
-EmptyStatement:
-	empty?=";"+;
+Declaration:
+	VariableDeclaration
+	| FunctionDeclaration
+	| ClassDeclaration;
+
+Expression:
+	AssignmentExpression
+	| TernaryExpression;
 
 ExpressionStatement:
 	expression=Expression ";"?;
 
+VariableDeclaration:
+	(mutable?=("let" | "var") | "const") name=ID (":" type=TypeExpression)? ("=" value=Expression)?;
+
+TypeDeclarationStatement:
+	Decorators Export "type" name=ID "=" type=TypeExpression ";";
+
+FunctionDeclaration:
+	Decorators Export "function" GenericParameters (name=ID)? Parameters (":" returnType=TypeExpression)? block=BlockStatement;
+
+ClassDeclaration:
+	Decorators Export "class" name=ID GenericParameters ("extends" extends=TypeExpression) "{" members+=ClassMember* "}";
+
+ClassMember:
+	ConstructorClassMember | FieldClassMember | MethodClassMember | GetterClassMember | SetterClassMember;
+
+FieldClassMember:
+	Decorators (private?="private")? name=ID ":" type=TypeExpression ("=" initializer=Expression);
+
+MethodClassMember:
+	Decorators (private?="private")? name=ID GenericParameters Parameters ":" returnType=TypeExpression block=BlockStatement;
+
+GetterClassMember:
+	Decorators (private?="private")? "get" name=ID ":" returnType=TypeExpression block=BlockStatement;
+
+SetterClassMember:
+	Decorators (private?="private")? "set" name=ID "(" parameter=Parameter ")" block=BlockStatement;
+
+ConstructorClassMember:
+	Decorators (private?="private")? "constructor" Parameters block=BlockStatement;
+
+WhileStatement:
+	"while" "(" condition=Expression ")" statement=Statement;
+
+ForStatement: 
+	"for" "(" conditions+=Expression* ";" (conditions+=Expression*)? ")" statement=Statement;
+
+IfStatement:
+	"if" "(" condition=ExpressionStatement ")" statement=Statement;
+
+TernaryExpression:
+	condition=AssignmentExpression "?" truthy=ExpressionStatement ":" falsy=ExpressionStatement;
+
+Parameter:
+	name=ID (":" type=TypeExpression)?;
+
+BlockStatement:
+	"{" statements+=Statement* "}";
+
+EmptyStatement:
+	empty?=";"+;
+
 ReturnStatement:
 	"return" expression=Expression ";"?;
-
-VariableDeclaration:
-	(mutable?=("let" | "var") | "const") name=IDENTIFIER (":" type=TypeExpression)? ("=" value=Expression)?;
-
-Expression:
-	AssignmentExpression;
 
 AssignmentExpression:
 	IdentifierExpression ({infer BinaryExpression.lhs=current} op="=" rhs=SumExpression)*
@@ -58,10 +105,10 @@ NumberLiteral:
 	FloatLiteral | IntegerLiteral;
 
 FloatLiteral:
-	value=FLOAT;
+	value=Float;
 
 IntegerLiteral:
-	value=INT;
+	value=FLOAT;
 
 GroupLiteral:
 	"(" value=Expression ")";
@@ -70,29 +117,43 @@ InvalidParenthesis:
 	empty?="(" ")";
 
 IdentifierExpression:
-	text=IDENTIFIER;
-
-// Classic js `function`
-FunctionDeclaration<nameRequired>:
-	"function" (<nameRequired> name=IDENTIFIER | <!nameRequired> name=IDENTIFIER?) "("
-		( params+=Parameter ("," params+=Parameter)* )?
-	")" (":" returnType=TypeExpression)? body=BlockStatement;
-
-Parameter:
-	name=IDENTIFIER (":" type=TypeExpression)?;
-
-BlockStatement:
-	"{" statements+=Statement* "}";
+	text=ID;
 
 TypeExpression:
-	text=IDENTIFIER;
+	NamedTypeExpression;
 
-// Convention: terminals are named in all caps.
+NamedTypeExpression:
+    name=ID TypeParameters;
+
+Decorator:
+	"@" name=ID CallParameters?;
+
+fragment Export:
+	(export?="export");
+
+fragment Decorators:
+	decorators+=Decorator*;
+
+fragment CallParameters:
+	"(" (parameters+=Expression ("," parameters+=Expression)*)? ")";
+
+fragment TypeParameters:
+    ("<" typeParameters+=TypeExpression ("," typeParameters+=TypeExpression)* ">")?;
+  
+fragment GenericParameters:
+	("<" typeParameters+=IdentifierExpression ("," typeParameters+=IdentifierExpression* ">")?);
+ 
+fragment Parameters:
+	"(" (parameters+=Parameter ("," parameters+=Parameter)*)? ")";
+
 hidden terminal WS: /\s+/;
-terminal IDENTIFIER: /[_a-zA-Z][\w_]*/;
-terminal FLOAT returns number: /[0-9]+\.[0-9]*/;
-terminal INT returns number: /[0-9]+/;
-terminal STRING: /"[^"]*"|"[^"]*"/; // We"re not handling strings yet.
+terminal ID: /[_a-zA-Z][\w_]*/;
+terminal BINARY: /0b[10]+/;
+terminal HEX: /0x[0-9a-fA-F]+/;
+terminal OCTAL: /0o[0-7]+/;
+terminal Float: /[-+]?[0-9]+[.][0-9]+([eE][-+]?[0-9]+)?/;
+terminal FLOAT: /[-+]?[0-9]+/;
+terminal STRING: /"([^"\r\n]|\\\.)*"/;
 
 hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
 hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
