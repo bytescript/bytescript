@@ -30,7 +30,9 @@ Expression:
 	| TernaryExpression;
 
 ExpressionStatement:
-	expression=Expression ";"?;
+	Expression
+	| Statement
+	";"?;
 
 VariableDeclaration:
 	(mutable?=("let" | "var") | "const") name=ID (":" type=TypeExpression)? ("=" value=Expression)?;
