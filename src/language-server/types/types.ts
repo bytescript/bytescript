@@ -50,7 +50,7 @@ export function getType(node: AstNode): TypeDescription {
 		} else {
 			const paramTypes: FunctionParameter[] = [];
 
-			for (const param of node.params) {
+			for (const param of node.parameters) {
 				if (!param.type) {
 					type = createErrorType(
 						"Parameter types not inferred from call sites yet (use parameter type annotations)",
@@ -61,7 +61,7 @@ export function getType(node: AstNode): TypeDescription {
 				}
 
 				paramTypes.push({
-					name: node.name,
+					name: node.name!,
 					type: getType(param.type),
 				});
 			}
@@ -79,9 +79,9 @@ export function getType(node: AstNode): TypeDescription {
 }
 
 function inferTypeExpression(node: TypeExpression): TypeDescription {
-	if (node.text === "number") return createLiteralNumberType();
-	else if (node.text === "i32") return createI32NumberType();
-	else if (node.text === "f64") return createF64NumberType();
+	if (node.name === "number") return createLiteralNumberType();
+	else if (node.name === "i32") return createI32NumberType();
+	else if (node.name === "f64") return createF64NumberType();
 	else return createErrorType("Only `number`, `i32`, and `f64` types supported for now", node);
 }
 

@@ -37,7 +37,7 @@ export function getNameOfNode(node: AstNode): string | null {
     if (isVariableDeclaration(node)) {
         return node.name;
     } else if (isFunctionDeclaration(node)) {
-        return node.name;
+        return node.name!;
     }
     return null;
 }

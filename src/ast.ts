@@ -1,36 +1,39 @@
 import {
     BinaryExpression,
     BlockStatement,
-    CallExpression,
     FunctionDeclaration,
     Expression,
     FloatLiteral,
-    IdentifierExpression,
+    Identifier,
     IntegerLiteral,
     NumberLiteral,
     Parameter,
     TypeExpression,
     VariableDeclaration,
+    FunctionCallExpression,
 } from "./language-server/generated/ast";
 
 export abstract class Node {
     constructor() { }
-    static createIdentifierExpression(text: string): IdentifierExpression {
+
+    static createIdentifier(text: string): Identifier {
         // @ts-ignore
         return {
-            text: text,
+            value: text,
         };
     }
+
     static createNumberLiteral(num: string): NumberLiteral {
         // @ts-ignore
         return {
-            value: num.includes(".") ? parseFloat(num) : parseInt(num),
+            value: num,
         };
     }
+
     static createBinaryExpression(
-        left: IdentifierExpression | NumberLiteral,
+        left: Identifier | NumberLiteral,
         op: "*" | "+" | "-" | "/" | "=",
-        right: IdentifierExpression | NumberLiteral,
+        right: Identifier | NumberLiteral,
     ): BinaryExpression {
         // @ts-ignore
         return {
@@ -39,13 +42,15 @@ export abstract class Node {
             rhs: right,
         };
     }
-    static createCallExpression(calling: IdentifierExpression, args: Expression[]): CallExpression {
+
+    static createFunctionCallExpression(name: string, args: NumberLiteral[]): FunctionCallExpression {
         // @ts-ignore
         return {
-            callee: calling,
-            args: args,
+            name: name,
+            args: args
         };
     }
+    
     static createFunctionDeclaration(
         name: string,
         params: Parameter[],
@@ -56,7 +61,7 @@ export abstract class Node {
             // @ts-ignore
             return {
                 name: name,
-                params: params,
+                parameters: params,
                 body: body,
                 returnType: returnType!,
             };
@@ -64,23 +69,26 @@ export abstract class Node {
             // @ts-ignore
             return {
                 name: name,
-                params: params,
+                parameters: params,
                 body: body,
             };
         }
     }
+
     static createFloatLiteral(num: string): FloatLiteral {
         // @ts-ignore
         return {
-            value: parseFloat(num),
+            value: num,
         };
     }
+
     static createIntegerLiteral(num: string): IntegerLiteral {
         // @ts-ignore
         return {
-            value: parseInt(num),
+            value: num,
         };
     }
+
     static createParameter(name: string, type: TypeExpression): Parameter {
         // @ts-ignore
         return {
@@ -88,12 +96,14 @@ export abstract class Node {
             type: type,
         };
     }
+
     static createReturnStatement(expression: Expression) {
         // @ts-ignore
         return {
             expression: expression,
         };
     }
+
     static createVariableDeclaration(
         name: string,
         mutable: boolean,

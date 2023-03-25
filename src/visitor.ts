@@ -33,7 +33,7 @@ export class Visitor {
 		}
 	}
 	visitFunctionDeclaration(node: FunctionDeclaration) {
-		this.visitStatements(node.params);
+		this.visitStatements(node.parameters);
 		this.visitStatements(node.body.statements);
 	}
 	visitReturnStatement(node: ReturnStatement) {

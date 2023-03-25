@@ -12,9 +12,7 @@ Statement:
 	| ForStatement
 	| IfStatement
 	| ReturnStatement
-	| ExpressionStatement
-	| EmptyStatement
-	";";
+	| EmptyStatement;
 
 Declaration:
 	VariableDeclaration
@@ -26,48 +24,47 @@ Declaration:
 
 Expression:
 	FunctionCallExpression
-	AssignmentExpression
+	| AssignmentExpression
 	| TernaryExpression;
 
 ExpressionStatement:
-	Expression
-	| Statement
-	";"?;
+	Expression;
 
 VariableDeclaration:
-	(mutable?=("let" | "var") | "const") name=ID (":" type=TypeExpression)? ("=" value=Expression)?;
+	(mutable?=("let" | "var") | "const") name=ID (":" type=TypeExpression)? "=" value=Expression;
+
 FunctionDeclaration:
-	Decorators Export "function" GenericParameters (name=ID)? Parameters (":" returnType=TypeExpression)? block=BlockStatement;
+	"function" GenericParameters? name=ID Parameters (":" returnType=TypeExpression)? body=BlockStatement;
 
 ClassDeclaration:
-	Decorators Export "class" name=ID GenericParameters ("extends" extends=TypeExpression) "{" members+=ClassMember* "}";
+	"class" name=ID GenericParameters? ("extends" extends=TypeExpression)? "{" members+=ClassMember* "}";
 
 ClassMember:
 	ConstructorClassMember | FieldClassMember | MethodClassMember | GetterClassMember | SetterClassMember;
 
 FieldClassMember:
-	Decorators (private?="private")? name=ID ":" type=TypeExpression ("=" initializer=Expression);
+	(private?="private")? name=ID ":" type=TypeExpression ("=" initializer=Expression);
 
 MethodClassMember:
-	Decorators (private?="private")? name=ID GenericParameters Parameters ":" returnType=TypeExpression block=BlockStatement;
+	(private?="private")? name=ID GenericParameters Parameters ":" returnType=TypeExpression block=BlockStatement;
 
 GetterClassMember:
-	Decorators (private?="private")? "get" name=ID ":" returnType=TypeExpression block=BlockStatement;
+	(private?="private")? "get" name=ID ":" returnType=TypeExpression block=BlockStatement;
 
 SetterClassMember:
-	Decorators (private?="private")? "set" name=ID "(" parameter=Parameter ")" block=BlockStatement;
+	(private?="private")? "set" name=ID "(" parameter=Parameter ")" block=BlockStatement;
 
 ConstructorClassMember:
-	Decorators (private?="private")? "constructor" Parameters block=BlockStatement;
+	(private?="private")? "constructor" Parameters block=BlockStatement;
 
 TypeDeclaration:
-	Decorators Export "type" name=ID "=" type=TypeExpression ";";
+	"type" name=ID "=" type=TypeExpression;
 
 EnumDeclaration:
-	Decorators Export "enum" name=ID "{" members+=EnumDeclarator ("," members+=EnumDeclarator)* "}";
+	"enum" name=ID "{" members+=EnumDeclarator ("," members+=EnumDeclarator)* "}";
 
 NamespaceDeclaration:
-	Decorators Export "namespace" name=ID "{" members+=Statement* "}";
+	"namespace" name=ID "{" members+=Statement* "}";
 
 EnumDeclarator:
 	name=ID ("=" value=IntegerLiteral)?;
@@ -100,7 +97,7 @@ ReturnStatement:
 	"return" expression=Expression ";"?;
 
 AssignmentExpression:
-	IdentifierExpression ({infer BinaryExpression.lhs=current} op="=" rhs=SumExpression)*
+	Identifier ({infer BinaryExpression.lhs=current} op="=" rhs=SumExpression)*
 	| SumExpression;
 
 SumExpression:
@@ -110,13 +107,13 @@ ProductExpression:
 	PathExpression ({infer BinaryExpression.lhs=current} op=("*" | "/") rhs=PathExpression)*;
 
 PathExpression:
-	IdentifierExpression (
+	Identifier (
 		{infer CallExpression.callee=current} "(" (args+=Expression ("," args+=Expression)* ","? )? ")"
 	)*
 	| PrimaryExpression;
 
 PrimaryExpression:
-	GroupLiteral | IdentifierExpression | NumberLiteral | InvalidParenthesis;
+	GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis;
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral;
@@ -158,7 +155,7 @@ fragment TypeParameters:
     ("<" typeParameters+=TypeExpression ("," typeParameters+=TypeExpression)* ">")?;
   
 fragment GenericParameters:
-	("<" typeParameters+=IdentifierExpression ("," typeParameters+=IdentifierExpression* ">")?);
+	("<" typeParameters+=Identifier ("," typeParameters+=Identifier* ">")?);
  
 fragment Parameters:
 	"(" (parameters+=Parameter ("," parameters+=Parameter)*)? ")";
