@@ -25,6 +25,7 @@ Declaration:
 	| NamespaceDeclaration;
 
 Expression:
+	FunctionCallExpression
 	AssignmentExpression
 	| TernaryExpression;
 
@@ -78,6 +79,9 @@ ForStatement:
 IfStatement:
 	"if" "(" condition=ExpressionStatement ")" statement=Statement;
 
+FunctionCallExpression:
+	name=ID "(" args+=NumberLiteral | Identifier ("," args+=NumberLiteral | Identifier)? ")";
+
 TernaryExpression:
 	condition=AssignmentExpression "?" truthy=ExpressionStatement ":" falsy=ExpressionStatement;
 
@@ -127,8 +131,8 @@ GroupLiteral:
 InvalidParenthesis:
 	empty?="(" ")";
 
-IdentifierExpression:
-	text=ID;
+Identifier:
+	value=ID;
 
 TypeExpression:
 	NamedTypeExpression;
