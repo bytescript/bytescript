@@ -43,19 +43,19 @@ ClassMember:
 	ConstructorClassMember | FieldClassMember | MethodClassMember | GetterClassMember | SetterClassMember;
 
 FieldClassMember:
-	(private?="private")? name=ID ":" type=TypeExpression ("=" initializer=Expression);
+	(private?=("private" | "public"))? name=ID ":" type=TypeExpression ("=" initializer=Expression);
 
 MethodClassMember:
-	(private?="private")? name=ID GenericParameters Parameters ":" returnType=TypeExpression block=BlockStatement;
+	(private?=("private" | "public"))? name=ID GenericParameters Parameters ":" returnType=TypeExpression block=BlockStatement;
 
 GetterClassMember:
-	(private?="private")? "get" name=ID ":" returnType=TypeExpression block=BlockStatement;
+	(private?=("private" | "public"))? "get" name=ID ":" returnType=TypeExpression block=BlockStatement;
 
 SetterClassMember:
-	(private?="private")? "set" name=ID "(" parameter=Parameter ")" block=BlockStatement;
+	(private?=("private" | "public"))? "set" name=ID "(" parameter=Parameter ")" block=BlockStatement;
 
 ConstructorClassMember:
-	(private?="private")? "constructor" Parameters block=BlockStatement;
+	(private?=("private" | "public"))? "constructor" Parameters block=BlockStatement;
 
 TypeDeclaration:
 	"type" name=ID "=" type=TypeExpression;
