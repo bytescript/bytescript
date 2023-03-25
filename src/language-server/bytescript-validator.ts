@@ -1,6 +1,6 @@
 import { ValidationAcceptor, ValidationChecks } from "langium";
 import {
-	ByteScriptAstType, FunctionDeclaration, VariableDeclaration,
+	ByteScriptAstType, FunctionDeclaration, VariableStatement,
 } from "./generated/ast";
 import { ByteScriptServices } from "./bytescript-module";
 import { Scope } from "../scope";
@@ -13,7 +13,7 @@ export function registerValidationChecks(services: ByteScriptServices) {
 	const registry = services.validation.ValidationRegistry;
 	const validator = services.validation.ByteScriptValidator;
 	const checks: ValidationChecks<ByteScriptAstType> = {
-		VariableDeclaration: validator.validateVariableDeclaration,
+		VariableStatement: validator.validateVariableDeclaration,
 		FunctionDeclaration: validator.validateFunctionDeclaration
 	};
 	registry.register(checks, validator);
@@ -24,7 +24,7 @@ export function registerValidationChecks(services: ByteScriptServices) {
  */
 
 export class ByteScriptValidator {
-	validateVariableDeclaration(node: VariableDeclaration, accept: ValidationAcceptor) {
+	validateVariableDeclaration(node: VariableStatement, accept: ValidationAcceptor) {
 		if (globalScope.has(node.name!)) {
 			// It is the same node, so update it.
 			if (globalScope.get(node.name!)?.$containerIndex! == node.$containerIndex!) {

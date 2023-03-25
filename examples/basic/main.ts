@@ -10,6 +10,7 @@ type i32 = number
 type f64 = number
 let foo = 2.32
 let foo = 321
+
 function foo(bar: i32): f64 {
 }
 

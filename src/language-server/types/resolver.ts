@@ -1,10 +1,4 @@
-import type { Expression, TypeExpression } from "../../language-server/generated/ast";
-
-/*
-function foo(a: i32, b: i32) {
-    return 3.14;
-}
-*/
+/*import type { Expression, TypeExpression } from "../../language-server/generated/ast";
 
 abstract class Type { }
 
@@ -67,4 +61,4 @@ function resolveExpression(context: TypeResolutionContext, expression: Expressio
         //case "DoExpression":
         case "TernaryExpression":
     }
-};
+};*/
