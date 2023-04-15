@@ -1,127 +1,127 @@
 import {
-    BinaryExpression,
-    BlockStatement,
-    FunctionDeclaration,
-    Expression,
-    FloatLiteral,
-    Identifier,
-    IntegerLiteral,
-    NumberLiteral,
-    Parameter,
-    TypeExpression,
-    VariableStatement,
-    FunctionCallExpression,
-} from "./language-server/generated/ast";
+	BinaryExpression,
+	BlockStatement,
+	FunctionDeclaration,
+	Expression,
+	FloatLiteral,
+	Identifier,
+	IntegerLiteral,
+	NumberLiteral,
+	Parameter,
+	TypeExpression,
+	VariableStatement,
+	FunctionCallExpression,
+} from './language-server/generated/ast'
 
 export abstract class Node {
-    constructor() { }
+	constructor() {}
 
-    static createIdentifier(text: string): Identifier {
-        // @ts-ignore
-        return {
-            value: text,
-        };
-    }
+	static createIdentifier(text: string): Identifier {
+		// @ts-ignore
+		return {
+			value: text,
+		}
+	}
 
-    static createNumberLiteral(num: string): NumberLiteral {
-        // @ts-ignore
-        return {
-            value: num,
-        };
-    }
+	static createNumberLiteral(num: string): NumberLiteral {
+		// @ts-ignore
+		return {
+			value: num,
+		}
+	}
 
-    static createBinaryExpression(
-        left: Identifier | NumberLiteral,
-        op: "*" | "+" | "-" | "/" | "=",
-        right: Identifier | NumberLiteral,
-    ): BinaryExpression {
-        // @ts-ignore
-        return {
-            lhs: left,
-            op: op,
-            rhs: right,
-        };
-    }
+	static createBinaryExpression(
+		left: Identifier | NumberLiteral,
+		op: '*' | '+' | '-' | '/' | '=',
+		right: Identifier | NumberLiteral,
+	): BinaryExpression {
+		// @ts-ignore
+		return {
+			lhs: left,
+			op: op,
+			rhs: right,
+		}
+	}
 
-    static createFunctionCallExpression(name: string, args: NumberLiteral[]): FunctionCallExpression {
-        // @ts-ignore
-        return {
-            name: name,
-            args: args
-        };
-    }
-    
-    static createFunctionDeclaration(
-        name: string,
-        params: Parameter[],
-        body: BlockStatement,
-        returnType: TypeExpression | null = null,
-    ): FunctionDeclaration {
-        if (returnType) {
-            // @ts-ignore
-            return {
-                name: name,
-                parameters: params,
-                body: body,
-                returnType: returnType!,
-            };
-        } else {
-            // @ts-ignore
-            return {
-                name: name,
-                parameters: params,
-                body: body,
-            };
-        }
-    }
+	static createFunctionCallExpression(name: string, args: NumberLiteral[]): FunctionCallExpression {
+		// @ts-ignore
+		return {
+			name: name,
+			args: args,
+		}
+	}
 
-    static createFloatLiteral(num: string): FloatLiteral {
-        // @ts-ignore
-        return {
-            value: num,
-        };
-    }
+	static createFunctionDeclaration(
+		name: string,
+		params: Parameter[],
+		body: BlockStatement,
+		returnType: TypeExpression | null = null,
+	): FunctionDeclaration {
+		if (returnType) {
+			// @ts-ignore
+			return {
+				name: name,
+				parameters: params,
+				body: body,
+				returnType: returnType!,
+			}
+		} else {
+			// @ts-ignore
+			return {
+				name: name,
+				parameters: params,
+				body: body,
+			}
+		}
+	}
 
-    static createIntegerLiteral(num: string): IntegerLiteral {
-        // @ts-ignore
-        return {
-            value: num,
-        };
-    }
+	static createFloatLiteral(num: string): FloatLiteral {
+		// @ts-ignore
+		return {
+			value: num,
+		}
+	}
 
-    static createParameter(name: string, type: TypeExpression): Parameter {
-        // @ts-ignore
-        return {
-            name: name,
-            type: type,
-        };
-    }
+	static createIntegerLiteral(num: string): IntegerLiteral {
+		// @ts-ignore
+		return {
+			value: num,
+		}
+	}
 
-    static createReturnStatement(expression: Expression) {
-        // @ts-ignore
-        return {
-            expression: expression,
-        };
-    }
+	static createParameter(name: string, type: TypeExpression): Parameter {
+		// @ts-ignore
+		return {
+			name: name,
+			type: type,
+		}
+	}
 
-    static createVariableStatement(
-        name: string,
-        mutable: boolean,
-        type: TypeExpression | null = null,
-        value: Expression | null = null,
-    ): VariableStatement {
-        if (!type && !value) {
-            throw new Error("Cannot create variable statement if both type and value are not supplied.");
-        } else if (value) {
-            //type = getType(value);
-        }
-        // @ts-ignore
-        return {
-            name: name,
-            mutable: mutable,
-            type: type!,
-            // @ts-ignore
-            value: value,
-        };
-    }
+	static createReturnStatement(expression: Expression) {
+		// @ts-ignore
+		return {
+			expression: expression,
+		}
+	}
+
+	static createVariableStatement(
+		name: string,
+		mutable: boolean,
+		type: TypeExpression | null = null,
+		value: Expression | null = null,
+	): VariableStatement {
+		if (!type && !value) {
+			throw new Error('Cannot create variable statement if both type and value are not supplied.')
+		} else if (value) {
+			//type = getType(value);
+		}
+		// @ts-ignore
+		return {
+			name: name,
+			mutable: mutable,
+			type: type!,
+			// @ts-ignore
+			value: value,
+		}
+	}
 }

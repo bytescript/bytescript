@@ -1,22 +1,20 @@
-import { ValidationAcceptor, ValidationChecks } from "langium";
-import {
-	ByteScriptAstType, FunctionDeclaration, VariableStatement,
-} from "./generated/ast";
-import { ByteScriptServices } from "./bytescript-module";
-import { Scope } from "../scope";
+import {ValidationAcceptor, ValidationChecks} from 'langium'
+import {ByteScriptAstType, FunctionDeclaration, VariableStatement} from './generated/ast'
+import {ByteScriptServices} from './bytescript-module'
+import {Scope} from '../scope'
 
-const globalScope = new Scope();
+const globalScope = new Scope()
 /**
  * Register custom validation checks.
  */
 export function registerValidationChecks(services: ByteScriptServices) {
-	const registry = services.validation.ValidationRegistry;
-	const validator = services.validation.ByteScriptValidator;
+	const registry = services.validation.ValidationRegistry
+	const validator = services.validation.ByteScriptValidator
 	const checks: ValidationChecks<ByteScriptAstType> = {
 		VariableStatement: validator.validateVariableDeclaration,
-		FunctionDeclaration: validator.validateFunctionDeclaration
-	};
-	registry.register(checks, validator);
+		FunctionDeclaration: validator.validateFunctionDeclaration,
+	}
+	registry.register(checks, validator)
 }
 
 /**
@@ -28,40 +26,40 @@ export class ByteScriptValidator {
 		if (globalScope.has(node.name!)) {
 			// It is the same node, so update it.
 			if (globalScope.get(node.name!)?.$containerIndex! == node.$containerIndex!) {
-				globalScope.add(node.name!, node);
+				globalScope.add(node.name!, node)
 				// Keep order precise.
 				// The first declaration with name "bar" should be okay
 				// But the second one with the name "bar" should error
 			} else if (globalScope.get(node.name!)?.$containerIndex! < node.$containerIndex!) {
 				// It already exists
-				accept("error", `'${node.name!}' is already defined.`, {
+				accept('error', `'${node.name!}' is already defined.`, {
 					node: node,
-					property: "name"
-				});
+					property: 'name',
+				})
 			}
 		} else {
-			globalScope.add(node.name!, node);
+			globalScope.add(node.name!, node)
 		}
 	}
 	validateFunctionDeclaration(node: FunctionDeclaration, accept: ValidationAcceptor) {
 		if (globalScope.has(node.name!)) {
 			// FunctionDeclaration overrides VariableDeclaration
-			if (globalScope.get(node.name!)?.$type == "VariableDeclaration") {
-				accept("error", `${node.name!} is already defined.`, {
+			if (globalScope.get(node.name!)?.$type == 'VariableDeclaration') {
+				accept('error', `${node.name!} is already defined.`, {
 					node: globalScope.get(node.name!)!,
-					property: "name"
-				});
-				globalScope.add(node.name!, node);
+					property: 'name',
+				})
+				globalScope.add(node.name!, node)
 			} else if (globalScope.get(node.name!)?.$containerIndex! == node.$containerIndex!) {
-				globalScope.add(node.name!, node);
+				globalScope.add(node.name!, node)
 			} else if (globalScope.get(node.name!)?.$containerIndex! < node.$containerIndex!) {
-				accept("error", `${node.name!} is already defined.`, {
+				accept('error', `${node.name!} is already defined.`, {
 					node: node,
-					property: "name"
-				});
+					property: 'name',
+				})
 			}
 		} else {
-			globalScope.add(node.name!, node);
+			globalScope.add(node.name!, node)
 		}
 	}
 }

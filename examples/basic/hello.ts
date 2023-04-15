@@ -1,3 +1,3 @@
 export function _start(): void {
-    print("Hello World")
+	print('Hello World')
 }
