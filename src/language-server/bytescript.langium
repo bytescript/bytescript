@@ -8,33 +8,30 @@ TopLevelStatement:
 
 Statement:
 	Declaration
-	| WhileStatement
-	| ForStatement
-	| IfElseStatement
-	| ReturnStatement
-	| BlockStatement
-	| EmptyStatement;
+	| FunctionCallExpression ";"?
+	| WhileStatement ";"?
+	| ForStatement ";"?
+	| IfElseStatement ";"?
+	| ReturnStatement ";"?
+	| BlockStatement ";"?
+	| EmptyStatement ";"?;
 
 Declaration:
-	VariableStatement
-	| FunctionDeclaration
-	| ClassDeclaration
-	| TypeDeclaration
-	| EnumDeclaration
-	| NamespaceDeclaration;
+	VariableStatement ";"?
+	| FunctionDeclaration ";"?
+	| ClassDeclaration ";"?
+	| TypeDeclaration ";"?
+	| EnumDeclaration ";"?
+	| NamespaceDeclaration ";"?;
 
 Expression:
 	FunctionCallExpression
 	| AssignmentExpression
 	| TernaryExpression
-	| ArrowFunction
-	| DoExpression;
+	| ArrowFunction;
 
 ExpressionStatement:
 	Expression;
-
-DoExpression:
-	"do" contents=BlockStatement;
 
 IfElseStatement:
 	"if" "(" condition=Expression ")" truthy=Statement ("else" falsy=Statement)?;
@@ -43,7 +40,7 @@ VariableStatement:
 	(mutable?=("let" | "var") | "const") name=ID (":" type=TypeExpression)? "=" value=Expression;
 
 FunctionDeclaration:
-	Decorators "function" GenericParameters? name=ID Parameters (":" returnType=TypeExpression)? body=BlockStatement;
+	Decorators Export "function" name=ID GenericParameters? Parameters (":" returnType=TypeExpression)? body=BlockStatement;
 
 ClassDeclaration:
 	Decorators "class" name=ID GenericParameters? ("extends" extends=TypeExpression)? "{" members+=ClassMember* "}";
@@ -88,7 +85,7 @@ ArrowFunction:
 	Parameters ":" (returnType=TypeExpression)? "=>" body=Statement;
 
 FunctionCallExpression:
-	name=ID "(" (args+=NumberLiteral | Identifier)? ("," args+=NumberLiteral | Identifier)? ")";
+	name=ID "(" (args+=NumberLiteral | Identifier | StringLiteral)? ("," args+=NumberLiteral | Identifier)? ")";
 
 TernaryExpression:
 	condition=AssignmentExpression "?" truthy=ExpressionStatement ":" falsy=ExpressionStatement;
@@ -129,6 +126,9 @@ NumberLiteral:
 
 FloatLiteral:
 	value=Float;
+
+StringLiteral:
+	value=STRING;
 
 IntegerLiteral:
 	value=FLOAT;
@@ -176,7 +176,7 @@ terminal HEX: /0x[0-9a-fA-F]+/;
 terminal OCTAL: /0o[0-7]+/;
 terminal Float: /[-+]?[0-9]+[.][0-9]+([eE][-+]?[0-9]+)?/;
 terminal FLOAT: /[-+]?[0-9]+/;
-terminal STRING: /"([^"\r\n]|\\\.)*"/;
+terminal STRING: /"[^"]*"/;
 
 hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
 hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
