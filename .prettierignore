@@ -1,3 +1,6 @@
 node_modules/
 out/
 package-lock.json
+
+# for now don't format examples, because we are testing grammar (which includes formatting) so we'll have mixed formatting.
+examples/
