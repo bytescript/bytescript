@@ -6,20 +6,32 @@
 
 /////////////////////////////////////////////////////////
 // Testing Code ////////////////////////////////////////
+type Foo = number;
+type Bar = number;
 
-function foo(foo: i32): f64 {
-	/**
-	 * This is a var
-	 */
-	let foo = 456
+import { xxh3 } from "./src/hash.bs";
 
-	return 1.2;
-	return 1;
-	return (1 + 4);
-	return (Foo() * bar());
+export { xxh3 } from "./src/hash.bs";
 
-	return
-	(foo() * bar()); // should be an unreachable code error
+export {
+	foo1,
+	foo2,
+	foo3
+}
+
+function foo1(bar: i32): f64 {
+}
+
+function foo2(bar: i32): f64 {
+	return 3.14;
+}
+
+function foo3(bar: i32): f64 {
+	return 2;
+}
+
+function foo3(bar: i32): i32 {
+	return 2.0;
 }
 
 /**
@@ -76,7 +88,7 @@ function baz(a: f64, b: f64) { }
 // error missing parameter type annotation (no callsite generic inference yet)
 function baz(a: f64, b): i32 { }
 
-function () {} // error 
+function () {} // error
 
 // totally bad top level syntax
 const d Car = 2

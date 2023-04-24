@@ -1,11 +1,11 @@
 import type {AstNode} from 'langium'
-import type {NumberLiteral} from '../generated/ast'
+import type {Identifier, NumberLiteral, TypeExpression} from '../generated/ast'
 
-export type TypeDescription = NumberType | FunctionType | ErrorType
+export type TypeDescription = NumberType | FunctionType | TypeInferenceError
 
-type NumberType = LiteralNumberType | I32NumberType | F64NumberType
+type NumberType = LiteralNumberType | I32NumberType | F64NumberType | F32NumberType
 
-// `number` ///////////////////////////////////////////////////////////////
+// number
 
 export interface LiteralNumberType {
 	readonly $type: 'number'
@@ -23,7 +23,7 @@ export function isLiteralNumberType(item: TypeDescription): item is LiteralNumbe
 	return item.$type === 'number'
 }
 
-// `i32` //////////////////////////////////////////////////////////////////
+// i32
 
 export interface I32NumberType {
 	readonly $type: 'i32'
@@ -41,18 +41,62 @@ export function isI32NumberType(item: TypeDescription): item is I32NumberType {
 	return item.$type === 'i32'
 }
 
-// `f64` //////////////////////////////////////////////////////////////////
+// f32
 
-export class F64NumberType {
-	readonly $type = 'f64'
-	constructor(readonly literal?: NumberLiteral) {}
+export interface F32NumberType {
+	readonly $type: 'f32'
+	readonly literal?: NumberLiteral
+}
+export function createF32NumberType(literal?: NumberLiteral): F32NumberType {
+	return {
+		$type: 'f32',
+		literal,
+	}
+}
+
+export function isF32NumberType(item: TypeDescription): item is F32NumberType {
+	return item.$type === 'f32'
+}
+
+// f64
+
+export interface F64NumberType {
+	readonly $type: 'f64'
+	readonly literal?: NumberLiteral
+}
+
+export function createF64NumberType(literal?: NumberLiteral): F64NumberType {
+	return {
+		$type: 'f64',
+		literal,
+	}
 }
 
 export function isF64NumberType(item: TypeDescription): item is F64NumberType {
 	return item.$type === 'f64'
 }
 
-// `function` /////////////////////////////////////////////////////////////
+// type
+
+export interface TypeDeclaration {
+	readonly $type: 'type'
+	readonly name?: Identifier
+	readonly value?: TypeExpression
+}
+
+export function createTypeDeclaration(name: Identifier, value: TypeExpression): TypeDeclaration {
+	return {
+		$type: 'type',
+		name,
+		value,
+	}
+}
+
+export function isTypeDeclaration(item: TypeDeclaration): item is TypeDeclaration {
+	return item.$type === 'type'
+}
+
+// function
 
 export interface FunctionType {
 	readonly $type: 'function'
@@ -80,15 +124,15 @@ export function isFunctionType(item: TypeDescription): item is FunctionType {
 	return item.$type === 'function'
 }
 
-// type error /////////////////////////////////////////////////////////////
+// error
 
-export interface ErrorType {
+export interface TypeInferenceError {
 	readonly $type: 'error'
 	readonly source?: AstNode
 	readonly message: string
 }
 
-export function createErrorType(message: string, source?: AstNode): ErrorType {
+export function createTypeInferenceError(message: string, source?: AstNode): TypeInferenceError {
 	return {
 		$type: 'error',
 		message,
@@ -96,11 +140,9 @@ export function createErrorType(message: string, source?: AstNode): ErrorType {
 	}
 }
 
-export function isErrorType(item: TypeDescription): item is ErrorType {
+export function isTypeInferenceError(item: TypeDescription): item is TypeInferenceError {
 	return item.$type === 'error'
 }
-
-// ////////////////////////////////////////////////////////////////////////
 
 export function typeToString(item: TypeDescription): string {
 	if (isFunctionType(item)) {
