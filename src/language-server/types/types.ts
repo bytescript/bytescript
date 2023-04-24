@@ -1,5 +1,6 @@
 import type {AstNode} from 'langium'
 import {
+	BinaryExpression,
 	isClassicFunction,
 	isFloatLiteral,
 	isIntegerLiteral,
@@ -46,14 +47,14 @@ export function getType(node: AstNode): TypeDescription {
 		}
 	} else if (isClassicFunction(node)) {
 		if (!node.returnType) {
-			type = createTypeInferenceError('No return type inference yet (use a return type annotation)', node)
+			type = createTypeInferenceError('use a return type annotation (No return type inference yet)', node)
 		} else {
 			const paramTypes: FunctionParameter[] = []
 
-			for (const param of node.params) {
+			for (const param of node.parameters) {
 				if (!param.type) {
 					type = createTypeInferenceError(
-						'Parameter types not inferred from call sites yet (use parameter type annotations)',
+						'use parameter type annotations (Parameter types not inferred from call sites yet)',
 						node,
 					)
 
@@ -86,5 +87,13 @@ function inferTypeExpression(node: TypeExpression): TypeDescription {
 }
 
 export function isAssignable(from: TypeDescription, to: TypeDescription): boolean {
+	// class Foo
+	// class Bar extends Foo
+	// let b: Foo = new Bar
+	// Need to add more logic here on assignability.
 	return from.$type === to.$type
+}
+
+export function isAssignmentExpression(expr: BinaryExpression): boolean {
+	return expr.operator === '='
 }

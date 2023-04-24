@@ -4,27 +4,30 @@ entry ByteScriptCode:
 	statements+=TopLevelStatement*;
 
 TopLevelStatement:
-	ImportDeclaration
+	( ImportDeclaration
 	| ExportSpecifier
 	| TypeDeclaration
-	| Statement;
+	| Statement
+	) ';'?;
 
 Statement:
-	VariableDeclaration
+	( VariableDeclaration
 	| ClassicFunction<true>
 	| ReturnStatement
 	| ExpressionStatement
-	| EmptyStatement;
+	| EmptyStatement
+	| Expression
+	) ';'?;
 
 // DECLARATION
 
 // type foo = i32;
 TypeDeclaration:
-	"type" name=Identifier "=" value=TypeExpression ";"?;
+	"type" name=Identifier "=" value=TypeExpression;
 
 // import { foo as bar } from "specifier";
 ImportDeclaration:
-	"import" "{" (bindings+=ImportSpecifier ("," bindings+=ImportSpecifier)*)? "}" "from" specifier=STRING ";"?;
+	"import" "{" (bindings+=ImportSpecifier ("," bindings+=ImportSpecifier)*)? "}" "from" specifier=STRING;
 
 // foo as bar
 ImportSpecifier:
@@ -33,7 +36,7 @@ ImportSpecifier:
 // export { foo as bar } from "specifier";
 // export { foo, bar }
 ExportSpecifier:
-	"export" "{" (bindings+=ExportDeclarator ("," bindings+=ExportDeclarator)*)? "}" ("from" specifier=STRING)? ";"?;
+	"export" "{" (bindings+=ExportDeclarator ("," bindings+=ExportDeclarator)*)? "}" ("from" specifier=STRING)?;
 
 // foo as bar
 ExportDeclarator:
@@ -41,7 +44,7 @@ ExportDeclarator:
 
 // [var | let | const] foo: f32 = 3.14;
 VariableDeclaration:
-	variant=("var" | "let" | "const") name=IDENTIFIER (":" type=TypeExpression)? ("=" value=Expression)? ";"?;
+	variant=("var" | "let" | "const") name=Identifier (":" type=TypeExpression)? ("=" value=Expression)?;
 
 // STATEMENT
 
@@ -50,34 +53,30 @@ EmptyStatement:
 	empty?=";"+;
 
 ExpressionStatement:
-	expression=Expression ";"?;
+	expression=Expression;
 
 // return foo;
 ReturnStatement:
-	"return" expression=Expression ";"?;
+	"return" expression=Expression;
 
 // EXPRESSION
-Expression:
+Expression infers Expression: // why "infers Expression" here?
 	AssignmentExpression;
 
-AssignmentExpression:
-	Identifier ({infer BinaryExpression.lhs=current} op="=" rhs=SumExpression)*
-	| SumExpression;
+AssignmentExpression infers Expression:
+	SumExpression ({infer BinaryExpression.leftOperand=current} operator="=" rightOperand=SumExpression)*;
 
-SumExpression:
-	ProductExpression ({infer BinaryExpression.lhs=current} op=("+" | "-") rhs=ProductExpression)*;
+SumExpression infers Expression:
+	ProductExpression ({infer BinaryExpression.leftOperand=current} operator=("+" | "-") rightOperand=ProductExpression)*;
 
-ProductExpression:
-	PathExpression ({infer BinaryExpression.lhs=current} op=("*" | "/") rhs=PathExpression)*;
+ProductExpression infers Expression:
+	PrimaryExpression ({infer BinaryExpression.leftOperand=current} operator=("*" | "/") rightOperand=PrimaryExpression)*;
+
+PrimaryExpression infers Expression:
+	GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis | PathExpression;
 
 PathExpression:
-	Identifier (
-		{infer CallExpression.callee=current} "(" (args+=Expression ("," args+=Expression)* ","? )? ")"
-	)*
-	| PrimaryExpression;
-
-PrimaryExpression:
-	GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis;
+	function=[ClassicFunction:IDENTIFIER] ( {infer CallExpression.callee=current} CallArguments )*;
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral;
@@ -95,12 +94,12 @@ InvalidParenthesis:
 	empty?="(" ")";
 
 Identifier:
-	value=IDENTIFIER;
+	name=IDENTIFIER;
 
 ClassicFunction<nameRequired>:
-	"function" (<nameRequired> name=IDENTIFIER | <!nameRequired> name=IDENTIFIER?) "("
-		( params+=Parameter ("," params+=Parameter)* )?
-	")" (":" returnType=TypeExpression)? Block;
+	"function" (<nameRequired> name=IDENTIFIER | <!nameRequired> name=IDENTIFIER?)
+	Parameters
+	(":" ReturnType)? Block;
 
 Parameter:
 	name=IDENTIFIER (":" type=TypeExpression)?;
@@ -109,7 +108,10 @@ fragment Block:
 	"{" body+=Statement* "}";
 
 fragment Parameters:
-	"(" (parameters+=Parameter ("," parameters+=Parameter)*)? ")";
+	"(" ( parameters+=Parameter ("," parameters+=Parameter)* )? ")";
+
+fragment CallArguments:
+	"(" ( arguments+=Expression ("," arguments+=Expression)* )? ")";
 
 fragment ReturnType:
 	returnType=TypeExpression;
@@ -117,11 +119,13 @@ fragment ReturnType:
 TypeExpression:
 	primitive=("number" | "i32" | "f32" | "f64");
 
+type NamedElement = Parameter | ClassicFunction | VariableDeclaration;
+
 // Convention: terminals are named in all caps.
 hidden terminal WS: /\s+/;
 terminal IDENTIFIER: /[_a-zA-Z][\w_]*/;
-terminal FLOAT returns number: /[0-9]+\.[0-9]*/;
-terminal INT returns number: /[0-9]+/;
+terminal FLOAT returns number: /-?[0-9]+\.[0-9]*/;
+terminal INT returns number: /-?[0-9]+/;
 terminal STRING: /"[^"]*"|"[^"]*"/; // We"re not handling strings yet.
 
 hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;

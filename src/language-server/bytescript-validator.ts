@@ -8,9 +8,11 @@ import {
 	InvalidParenthesis,
 	ReturnStatement,
 	isReturnStatement,
+	// Expression,
+	BinaryExpression,
 } from './generated/ast'
 import type {ByteScriptServices} from './bytescript-module'
-import {getType, isAssignable} from './types/types'
+import {getType, isAssignable, isAssignmentExpression} from './types/types'
 import {TypeInferenceError, isTypeInferenceError, TypeDescription, typeToString} from './types/descriptions'
 
 /**
@@ -20,6 +22,8 @@ export function registerValidationChecks(services: ByteScriptServices) {
 	const registry = services.validation.ValidationRegistry
 	const validator = services.validation.ByteScriptValidator
 	const checks: ValidationChecks<ByteScriptAstType> = {
+		// Expression: validator.checkExpression,
+		BinaryExpression: validator.checkBinaryExpression,
 		VariableDeclaration: validator.checkVarDeclaration,
 		ClassicFunction: validator.checkClassicFunction,
 		CallExpression: validator.checkCallExpression,
@@ -32,43 +36,67 @@ export function registerValidationChecks(services: ByteScriptServices) {
  * Implementation of custom validations.
  */
 export class ByteScriptValidator {
+	checkBinaryExpression(expr: BinaryExpression, accept: ValidationAcceptor) {
+		if (isAssignmentExpression(expr)) {
+			this.checkAssignmentExpression(expr, accept)
+		}
+	}
+
+	checkAssignmentExpression(expr: BinaryExpression, accept: ValidationAcceptor) {
+		if (!isIdentifier(expr.leftOperand)) {
+			accept('error', `Only identifiers are currently supported on the left of an assignment expression.`, {
+				node: expr.leftOperand,
+				property: 'value',
+			})
+			return
+		}
+
+		console.log('assignment expr:', expr)
+
+		// TODO SCOPES: this cannot infer a type, we need to know the scope and the variable declaration from which to get the type from.
+		const leftType = getType(expr.leftOperand)
+		if (checkTypeError(expr.leftOperand, leftType, accept)) return
+
+		const rightType = getType(expr.leftOperand)
+		if (checkTypeError(expr.rightOperand, rightType, accept)) return
+
+		if (!isAssignable(rightType, leftType)) {
+			accept('error', `Type '${typeToString(rightType)}' is not assignable to type '${typeToString(leftType)}'.`, {
+				node: expr,
+				property: 'rightOperand',
+			})
+		}
+	}
+
 	checkVarDeclaration(varDecl: VariableDeclaration, accept: ValidationAcceptor): void {
 		const declType = getType(varDecl)
+		if (checkTypeError(varDecl, declType, accept)) return
 
-		if (maybeAcceptTypeInferenceError(varDecl, declType, accept)) return
+		console.log('declaration type:', declType.$type)
 
-		if (varDecl.type || varDecl.value) {
-			if (varDecl.value) {
-				const valueType = getType(varDecl.value)
+		if (varDecl.type) {
+			// Cast because we know the value exists (that's checked in getType)
+			const valueType = getType(varDecl.value!)
 
-				if (maybeAcceptTypeInferenceError(varDecl.value, valueType, accept)) return
-
-				if (varDecl.type) {
-					if (!isAssignable(valueType, declType)) {
-						accept(
-							'error',
-							`Type '${typeToString(valueType)}' is not assignable to type '${typeToString(declType)}'.`,
-							{node: varDecl, property: 'value'},
-						)
-					}
-				} else {
-					// Value is assignable because it was used to infer the declaration type.
-				}
+			if (!isAssignable(valueType, declType)) {
+				accept('error', `Type '${typeToString(valueType)}' is not assignable to type '${typeToString(declType)}'.`, {
+					node: varDecl,
+					property: 'value',
+				})
 			}
-		} else if (!varDecl.type && !varDecl.value) {
-			accept('error', 'Variable declarations require a type annotation and an assigned value', {
-				node: varDecl,
-				property: 'name',
-			})
+		} else {
+			// Otherwise the value is assignable because it was used to infer the declaration type.
 		}
 	}
 
 	checkClassicFunction(node: ClassicFunction, accept: ValidationAcceptor): void {
 		const type = getType(node)
-		maybeAcceptTypeInferenceError(node, type, accept)
+		checkTypeError(node, type, accept)
 
 		const returnType = getType(node.returnType!)
-		maybeAcceptTypeInferenceError(node, type, accept)
+		checkTypeError(node, type, accept)
+
+		console.log('function return type:', type.$type)
 
 		let returnStmt: ReturnStatement | null = null
 		for (const member of node.body) if (isReturnStatement(member)) returnStmt = member
@@ -80,12 +108,12 @@ export class ByteScriptValidator {
 			accept('error', "A function whose declared type is not 'void' must return a value", {node: node.returnType!})
 		} else {
 			const returnStmtType = getType(returnStmt!)
-			maybeAcceptTypeInferenceError(node, type, accept)
+			checkTypeError(node, type, accept)
 
 			if (!isAssignable(returnType, returnStmtType)) {
 				accept(
 					'error',
-					`Type '${typeToString(returnType)}' is not assignable to type '${typeToString(returnStmtType)}'.`,
+					`Type '${typeToString(returnStmtType)}' is not assignable to type '${typeToString(returnType)}'.`,
 					{node: returnStmt},
 				)
 			}
@@ -93,13 +121,19 @@ export class ByteScriptValidator {
 	}
 
 	checkCallExpression(call: CallExpression, accept: ValidationAcceptor) {
-		if (isIdentifier(call.callee)) {
-			const identifier = call.callee
-			const char = identifier.value.charAt(0)
-			if (char.toLowerCase() !== char) {
-				accept('error', 'FunctionCall: Expected lower case name.', {node: call, property: 'callee'})
-			}
+		// if (isIdentifier(call.function.ref!.name)) {
+		// ^ isIdentifier check not needed if using refs??
+
+		if (!call.callee.function.ref) {
+			accept('error', `Cannot find name.`, {node: call, property: 'callee'})
+			return
 		}
+
+		const char = call.callee.function.ref.name.charAt(0)
+		if (char.toLowerCase() !== char) {
+			accept('error', 'Expected lower case name.', {node: call, property: 'callee'})
+		}
+		// }
 	}
 
 	checkInvalidParenthesis(expression: InvalidParenthesis, accept: ValidationAcceptor) {
@@ -107,11 +141,7 @@ export class ByteScriptValidator {
 	}
 }
 
-function maybeAcceptTypeInferenceError(
-	node: AstNode,
-	type: TypeDescription,
-	accept: ValidationAcceptor,
-): type is TypeInferenceError {
+function checkTypeError(node: AstNode, type: TypeDescription, accept: ValidationAcceptor): type is TypeInferenceError {
 	if (isTypeInferenceError(type)) {
 		accept('error', type.message, {node})
 		return true
