@@ -124,6 +124,7 @@ export class ByteScriptValidator {
 		// if (isIdentifier(call.function.ref!.name)) {
 		// ^ isIdentifier check not needed if using refs??
 
+		// TODO get references working properly.
 		if (!call.callee.function.ref) {
 			accept('error', `Cannot find name.`, {node: call, property: 'callee'})
 			return
