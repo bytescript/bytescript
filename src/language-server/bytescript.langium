@@ -1,6 +1,6 @@
 grammar ByteScript
 
-entry ByteScriptCode:
+entry TopLevel:
 	statements+=TopLevelStatement*;
 
 TopLevelStatement:
@@ -12,9 +12,10 @@ TopLevelStatement:
 
 Statement:
 	( VariableDeclaration
-	| ClassicFunction<true>
+	| FunctionDeclaration
 	| ReturnStatement
-	| ExpressionStatement
+	// | ExpressionStatement
+	| Block
 	| EmptyStatement
 	| Expression
 	) ';'?;
@@ -23,7 +24,7 @@ Statement:
 
 // type foo = i32;
 TypeDeclaration:
-	"type" name=Identifier "=" value=TypeExpression;
+	"type" name=IDENTIFIER "=" value=TypeExpression;
 
 // import { foo as bar } from "specifier";
 ImportDeclaration:
@@ -31,7 +32,7 @@ ImportDeclaration:
 
 // foo as bar
 ImportSpecifier:
-	name=Identifier ("as" alias=Identifier)?;
+	name=IDENTIFIER ("as" alias=IDENTIFIER)?;
 
 // export { foo as bar } from "specifier";
 // export { foo, bar }
@@ -40,11 +41,11 @@ ExportSpecifier:
 
 // foo as bar
 ExportDeclarator:
-	name=Identifier ("as" alias=Identifier)?;
+	element=[NamedElement:IDENTIFIER] ("as" alias=IDENTIFIER)?;
 
 // [var | let | const] foo: f32 = 3.14;
 VariableDeclaration:
-	variant=("var" | "let" | "const") name=Identifier (":" type=TypeExpression)? ("=" value=Expression)?;
+	variant=("var" | "let" | "const") name=IDENTIFIER (":" type=TypeExpression)? ("=" value=Expression)?;
 
 // STATEMENT
 
@@ -52,12 +53,16 @@ VariableDeclaration:
 EmptyStatement:
 	empty?=";"+;
 
-ExpressionStatement:
-	expression=Expression;
+// ExpressionStatement:
+// 	expression=Expression;
 
 // return foo;
 ReturnStatement:
 	"return" expression=Expression;
+
+// Used for blockless arrow function returns
+ArrowReturnExpression:
+	expression=Expression;
 
 // EXPRESSION
 Expression infers Expression: // why "infers Expression" here?
@@ -72,11 +77,20 @@ SumExpression infers Expression:
 ProductExpression infers Expression:
 	PrimaryExpression ({infer BinaryExpression.leftOperand=current} operator=("*" | "/") rightOperand=PrimaryExpression)*;
 
-PrimaryExpression infers Expression:
-	GroupLiteral | Identifier | NumberLiteral | InvalidParenthesis | PathExpression;
+// Identifier:
+// 	name=IDENTIFIER;
 
-PathExpression:
-	function=[ClassicFunction:IDENTIFIER] ( {infer CallExpression.callee=current} CallArguments )*;
+PrimaryExpression infers Expression:
+	GroupLiteral
+	// | Identifier
+	| NumberLiteral | InvalidParenthesis | PossibleCallExpression;
+
+PossibleCallExpression infers Expression:
+	// Not called
+	({infer Identifier} element=[NamedElement:IDENTIFIER] )
+	// Called
+	// TODO For now only function declarations are callable, and a named function cannot yet reference itself (no recursion).
+	| ({infer CallExpression} callee=[FunctionDeclaration:IDENTIFIER] CallArguments );
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral;
@@ -93,19 +107,32 @@ GroupLiteral:
 InvalidParenthesis:
 	empty?="(" ")";
 
-Identifier:
-	name=IDENTIFIER;
+FunctionDeclaration:
+	OriginalFunctionDeclaration | GeneratorFunctionDeclaration;
 
-ClassicFunction<nameRequired>:
-	"function" (<nameRequired> name=IDENTIFIER | <!nameRequired> name=IDENTIFIER?)
-	Parameters
-	(":" ReturnType)? Block;
+OriginalFunctionDeclaration:
+	"function" name=IDENTIFIER Parameters (":" ReturnType)? body=Block;
+
+GeneratorFunctionDeclaration:
+	"function" "*" name=IDENTIFIER Parameters (":" ReturnType)? body=Block;
+
+FunctionExpression:
+	OriginalFunctionExpression | GeneratorFunctionExpression | ArrowFunctionExpression;
+
+OriginalFunctionExpression:
+	"function" name=IDENTIFIER? Parameters (":" ReturnType)? body=Block;
+
+GeneratorFunctionExpression:
+	"function" "*" name=IDENTIFIER? Parameters (":" ReturnType)? body=Block;
+
+ArrowFunctionExpression:
+	Parameters (":" ReturnType)? "=>" body=(ArrowReturnExpression | Block);
 
 Parameter:
 	name=IDENTIFIER (":" type=TypeExpression)?;
 
-fragment Block:
-	"{" body+=Statement* "}";
+Block:
+	"{" statements+=Statement* "}";
 
 fragment Parameters:
 	"(" ( parameters+=Parameter ("," parameters+=Parameter)* )? ")";
@@ -119,7 +146,12 @@ fragment ReturnType:
 TypeExpression:
 	primitive=("number" | "i32" | "f32" | "f64");
 
-type NamedElement = Parameter | ClassicFunction | VariableDeclaration;
+type NamedElement =
+	Parameter
+	| FunctionDeclaration
+	| VariableDeclaration
+	| ImportSpecifier
+	;
 
 // Convention: terminals are named in all caps.
 hidden terminal WS: /\s+/;

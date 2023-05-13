@@ -1,7 +1,7 @@
 import type {AstNode, ValidationAcceptor, ValidationChecks} from 'langium'
 import {
 	ByteScriptAstType,
-	ClassicFunction,
+	TopLevel,
 	VariableDeclaration,
 	CallExpression,
 	isIdentifier,
@@ -10,6 +10,11 @@ import {
 	isReturnStatement,
 	// Expression,
 	BinaryExpression,
+	FunctionExpression,
+	FunctionDeclaration,
+	Block,
+	ArrowReturnExpression,
+	TypeDeclaration,
 } from './generated/ast'
 import type {ByteScriptServices} from './bytescript-module'
 import {getType, isAssignable, isAssignmentExpression} from './types/types'
@@ -25,9 +30,13 @@ export function registerValidationChecks(services: ByteScriptServices) {
 		// Expression: validator.checkExpression,
 		BinaryExpression: validator.checkBinaryExpression,
 		VariableDeclaration: validator.checkVarDeclaration,
-		ClassicFunction: validator.checkClassicFunction,
+		FunctionExpression: validator.checkFunction,
+		FunctionDeclaration: validator.checkFunction,
 		CallExpression: validator.checkCallExpression,
 		InvalidParenthesis: validator.checkInvalidParenthesis,
+		Block: validator.checkBlock,
+		TypeDeclaration: validator.checkTypeDeclaration,
+		TopLevel: validator.checkTopLevel,
 	}
 	registry.register(checks, validator)
 }
@@ -36,6 +45,13 @@ export function registerValidationChecks(services: ByteScriptServices) {
  * Implementation of custom validations.
  */
 export class ByteScriptValidator {
+	checkTopLevel(topLevel: TopLevel, accept: ValidationAcceptor) {
+		for (const stmt of topLevel.statements) {
+			if (stmt.$type === 'ReturnStatement')
+				accept('error', 'SyntaxError: Return statements are allowed only inside functions.', {node: stmt})
+		}
+	}
+
 	checkBinaryExpression(expr: BinaryExpression, accept: ValidationAcceptor) {
 		if (isAssignmentExpression(expr)) {
 			this.checkAssignmentExpression(expr, accept)
@@ -46,7 +62,6 @@ export class ByteScriptValidator {
 		if (!isIdentifier(expr.leftOperand)) {
 			accept('error', `Only identifiers are currently supported on the left of an assignment expression.`, {
 				node: expr.leftOperand,
-				property: 'value',
 			})
 			return
 		}
@@ -89,7 +104,12 @@ export class ByteScriptValidator {
 		}
 	}
 
-	checkClassicFunction(node: ClassicFunction, accept: ValidationAcceptor): void {
+	checkFunction(node: FunctionDeclaration | FunctionExpression, accept: ValidationAcceptor): void {
+		if (node.$type === 'GeneratorFunctionDeclaration' || node.$type === 'GeneratorFunctionExpression') {
+			accept('error', 'Generator functions are not supported yet.', {node})
+			return
+		}
+
 		const type = getType(node)
 		checkTypeError(node, type, accept)
 
@@ -98,16 +118,25 @@ export class ByteScriptValidator {
 
 		console.log('function return type:', type.$type)
 
-		let returnStmt: ReturnStatement | null = null
-		for (const member of node.body) if (isReturnStatement(member)) returnStmt = member
+		let returnStmt: ReturnStatement | ArrowReturnExpression | null = null
+
+		if (node.body.$type !== 'Block') {
+			// blockless arrow function
+			returnStmt = node.body
+		} else {
+			// function with block
+			for (const stmt of node.body.statements) if (isReturnStatement(stmt)) returnStmt = stmt
+		}
+
 		if (!node.returnType) {
 			if (returnStmt) {
 				// TODO: Infer function return type from return value expression
 			}
 		} else if (!returnStmt) {
-			accept('error', "A function whose declared type is not 'void' must return a value", {node: node.returnType!})
+			// TODO underline the function header only, instead of the whole function body which is annoying.
+			accept('error', "A function whose declared type is not 'void' must return a value.", {node})
 		} else {
-			const returnStmtType = getType(returnStmt!)
+			const returnStmtType = getType(returnStmt)
 			checkTypeError(node, type, accept)
 
 			if (!isAssignable(returnType, returnStmtType)) {
@@ -121,24 +150,33 @@ export class ByteScriptValidator {
 	}
 
 	checkCallExpression(call: CallExpression, accept: ValidationAcceptor) {
-		// if (isIdentifier(call.function.ref!.name)) {
-		// ^ isIdentifier check not needed if using refs??
-
 		// TODO get references working properly.
-		if (!call.callee.function.ref) {
-			accept('error', `Cannot find name.`, {node: call, property: 'callee'})
+		if (!call.callee.ref) {
+			accept('error', `Cannot find function named '${call.callee.$refText}'.`, {node: call, property: 'callee'})
 			return
 		}
 
-		const char = call.callee.function.ref.name.charAt(0)
+		const char = call.callee.ref.name.charAt(0)
 		if (char.toLowerCase() !== char) {
 			accept('error', 'Expected lower case name.', {node: call, property: 'callee'})
 		}
-		// }
 	}
 
 	checkInvalidParenthesis(expression: InvalidParenthesis, accept: ValidationAcceptor) {
 		accept('error', 'SyntaxError: Expected expression.', {node: expression})
+	}
+
+	checkBlock(block: Block, accept: ValidationAcceptor) {
+		for (const stmt of block.statements) {
+			if (stmt.$type === 'ReturnStatement')
+				accept('error', 'SyntaxError: Return statements are currently allowed only at the top-level of a function.', {
+					node: stmt,
+				})
+		}
+	}
+
+	checkTypeDeclaration(node: TypeDeclaration, accept: ValidationAcceptor) {
+		accept('error', 'Type expressions are not supported yet.', {node})
 	}
 }
 

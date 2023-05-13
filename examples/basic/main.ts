@@ -9,8 +9,11 @@
 type Foo = number;
 type Bar = number;
 
-import { xxh3 } from "./src/hash.bs";
+return 123;
 
+import { xxh3, foo } from "./src/hash.bs";
+
+// TODO ScopeProvider needs to be customized to find the xxh3 *inside* the import statement
 export { xxh3 } from "./src/hash.bs";
 
 export {
@@ -41,6 +44,10 @@ var a = 456
 const b: i32 = 456
 let c = 1.0;
 let d: f64 = 1.0
+
+a;
+b;
+foo(b)
 
 // type error
 let e: f64 = 1

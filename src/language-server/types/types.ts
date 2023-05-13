@@ -1,7 +1,8 @@
 import type {AstNode} from 'langium'
 import {
 	BinaryExpression,
-	isClassicFunction,
+	isFunctionDeclaration,
+	isFunctionExpression,
 	isFloatLiteral,
 	isIntegerLiteral,
 	isReturnStatement,
@@ -15,7 +16,7 @@ import {
 	createFunctionType,
 	createI32NumberType,
 	createLiteralNumberType,
-	FunctionParameter,
+	FunctionTypeParameter,
 	TypeDescription,
 } from './descriptions'
 
@@ -45,24 +46,24 @@ export function getType(node: AstNode): TypeDescription {
 		} else {
 			type = createTypeInferenceError('All variable declarations need values for now', node)
 		}
-	} else if (isClassicFunction(node)) {
+	} else if (isFunctionDeclaration(node) || isFunctionExpression(node)) {
 		if (!node.returnType) {
-			type = createTypeInferenceError('use a return type annotation (No return type inference yet)', node)
+			type = createTypeInferenceError('Use a return type annotation (no return type inference yet).', node)
 		} else {
-			const paramTypes: FunctionParameter[] = []
+			const paramTypes: FunctionTypeParameter[] = []
 
 			for (const param of node.parameters) {
 				if (!param.type) {
 					type = createTypeInferenceError(
-						'use parameter type annotations (Parameter types not inferred from call sites yet)',
-						node,
+						'Use parameter type annotations (parameter types not inferred from call sites yet).',
+						param,
 					)
 
 					break
 				}
 
 				paramTypes.push({
-					name: node.name,
+					name: param.name,
 					type: getType(param.type),
 				})
 			}
@@ -71,7 +72,7 @@ export function getType(node: AstNode): TypeDescription {
 			if (!type) type = createFunctionType(paramTypes, getType(node.returnType))
 		}
 	} else {
-		type = createTypeInferenceError('Could not infer type for ' + node.$type, node)
+		type = createTypeInferenceError(`Could not infer type for ${node.$type}.`, node)
 	}
 
 	types.set(node, type)

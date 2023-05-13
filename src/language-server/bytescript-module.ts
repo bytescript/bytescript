@@ -10,6 +10,7 @@ import {
 } from 'langium'
 import {ByteScriptGeneratedModule, ByteScriptGeneratedSharedModule} from './generated/module'
 import {ByteScriptValidator, registerValidationChecks} from './bytescript-validator'
+import {ByteScriptScopeProvider} from './bytescript-scope'
 
 /**
  * Declaration of custom services - add your own service classes here.
@@ -34,6 +35,9 @@ export type ByteScriptServices = LangiumServices & ByteScriptAddedServices
 export const ByteScriptModule: Module<ByteScriptServices, PartialLangiumServices & ByteScriptAddedServices> = {
 	validation: {
 		ByteScriptValidator: () => new ByteScriptValidator(),
+	},
+	references: {
+		ScopeProvider: services => new ByteScriptScopeProvider(services),
 	},
 }
 
