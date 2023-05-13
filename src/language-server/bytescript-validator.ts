@@ -168,10 +168,23 @@ export class ByteScriptValidator {
 
 	checkBlock(block: Block, accept: ValidationAcceptor) {
 		for (const stmt of block.statements) {
-			if (stmt.$type === 'ReturnStatement')
-				accept('error', 'SyntaxError: Return statements are currently allowed only at the top-level of a function.', {
-					node: stmt,
-				})
+			if (stmt.$type === 'ReturnStatement') {
+				const block = stmt.$container
+				const func = block.$container
+
+				if (
+					func?.$type !== 'ArrowFunctionExpression' &&
+					func?.$type !== 'OriginalFunctionExpression' &&
+					func?.$type !== 'OriginalFunctionDeclaration' &&
+					func?.$type !== 'GeneratorFunctionDeclaration' &&
+					func?.$type !== 'GeneratorFunctionExpression'
+				) {
+					console.log('statement container:', func?.$type)
+					accept('error', 'SyntaxError: Return statements are currently allowed only at the top-level of a function.', {
+						node: stmt,
+					})
+				}
+			}
 		}
 	}
 
