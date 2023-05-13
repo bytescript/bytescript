@@ -37,6 +37,8 @@ function foo3(bar: i32): i32 {
 	return 2.0;
 }
 
+// function *gen() {} // generators notsup
+
 /**
  * Hello *there*
  */
@@ -68,7 +70,13 @@ export function foo(foo: i32): f64 {
 	 */
 	let bar = 5.6
 
-	return 2.5 + 4.5 + bar;
+	// returns in blocks not supported yet
+	// {
+	// 	return 123;
+	// }
+
+	return 2.5;
+	// return 2.5 + 4.5 + bar; // TODO check binary expressions
 }
 
 foo()

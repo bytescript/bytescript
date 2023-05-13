@@ -90,8 +90,13 @@ export class ByteScriptValidator {
 		console.log('declaration type:', declType.$type)
 
 		if (varDecl.type) {
+			if (!varDecl.value) {
+				accept('error', 'Variable declarations must have a value assigned up front.', {node: varDecl})
+				return
+			}
+
 			// Cast because we know the value exists (that's checked in getType)
-			const valueType = getType(varDecl.value!)
+			const valueType = getType(varDecl.value)
 
 			if (!isAssignable(valueType, declType)) {
 				accept('error', `Type '${typeToString(valueType)}' is not assignable to type '${typeToString(declType)}'.`, {
@@ -104,46 +109,53 @@ export class ByteScriptValidator {
 		}
 	}
 
-	checkFunction(node: FunctionDeclaration | FunctionExpression, accept: ValidationAcceptor): void {
-		if (node.$type === 'GeneratorFunctionDeclaration' || node.$type === 'GeneratorFunctionExpression') {
-			accept('error', 'Generator functions are not supported yet.', {node})
+	checkFunction(func: FunctionDeclaration | FunctionExpression, accept: ValidationAcceptor): void {
+		if (func.$type === 'GeneratorFunctionDeclaration' || func.$type === 'GeneratorFunctionExpression') {
+			accept('error', 'Generator functions are not supported yet.', {node: func})
 			return
 		}
 
-		const type = getType(node)
-		checkTypeError(node, type, accept)
+		// TODO remove this when we implement inferring from return statements.
+		if (!func.returnType) {
+			accept('error', 'Return type annotations are required.', {node: func})
+			return
+		}
 
-		const returnType = getType(node.returnType!)
-		checkTypeError(node, type, accept)
+		const type = getType(func)
+		checkTypeError(func, type, accept)
+
+		const returnType = getType(func.returnType)
+		checkTypeError(func, type, accept)
 
 		console.log('function return type:', type.$type)
 
-		let returnStmt: ReturnStatement | ArrowReturnExpression | null = null
+		let returnStmtOrExpr: ReturnStatement | ArrowReturnExpression | null = null
 
-		if (node.body.$type !== 'Block') {
+		if (func.body.$type !== 'Block') {
 			// blockless arrow function
-			returnStmt = node.body
+			returnStmtOrExpr = func.body
 		} else {
 			// function with block
-			for (const stmt of node.body.statements) if (isReturnStatement(stmt)) returnStmt = stmt
+			for (const stmt of func.body.statements) if (isReturnStatement(stmt)) returnStmtOrExpr = stmt
+			// TODO: Show an error for any statements after the first return.
 		}
 
-		if (!node.returnType) {
-			if (returnStmt) {
+		if (!func.returnType) {
+			if (returnStmtOrExpr) {
 				// TODO: Infer function return type from return value expression
 			}
-		} else if (!returnStmt) {
+		} else if (!returnStmtOrExpr) {
 			// TODO underline the function header only, instead of the whole function body which is annoying.
-			accept('error', "A function whose declared type is not 'void' must return a value.", {node})
+			accept('error', "A function whose return type is not 'void' must return a value.", {node: func})
 		} else {
-			const returnStmtType = getType(returnStmt)
-			checkTypeError(node, type, accept)
+			const returnStmtType = getType(returnStmtOrExpr)
+			checkTypeError(func, type, accept)
 
 			if (!isAssignable(returnType, returnStmtType)) {
 				accept(
 					'error',
 					`Type '${typeToString(returnStmtType)}' is not assignable to type '${typeToString(returnType)}'.`,
-					{node: returnStmt},
+					{node: returnStmtOrExpr},
 				)
 			}
 		}

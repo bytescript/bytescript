@@ -9,6 +9,7 @@ import {
 	isTypeExpression,
 	isVariableDeclaration,
 	TypeExpression,
+	isArrowReturnExpression,
 } from '../generated/ast'
 import {
 	createTypeInferenceError,
@@ -23,6 +24,11 @@ import {
 const types = new Map<AstNode, TypeDescription>()
 
 export function getType(node: AstNode): TypeDescription {
+	if (!node) {
+		console.log('UNDEFINED NODE:', node)
+		debugger
+	}
+
 	if (types.has(node)) return types.get(node)!
 
 	// Prevent recursive inference errors
@@ -36,7 +42,7 @@ export function getType(node: AstNode): TypeDescription {
 		type = createI32NumberType(node)
 	} else if (isTypeExpression(node)) {
 		type = inferTypeExpression(node)
-	} else if (isReturnStatement(node)) {
+	} else if (isReturnStatement(node) || isArrowReturnExpression(node)) {
 		type = getType(node.expression)
 	} else if (isVariableDeclaration(node)) {
 		if (node.type) {
@@ -48,7 +54,7 @@ export function getType(node: AstNode): TypeDescription {
 		}
 	} else if (isFunctionDeclaration(node) || isFunctionExpression(node)) {
 		if (!node.returnType) {
-			type = createTypeInferenceError('Use a return type annotation (no return type inference yet).', node)
+			type = createTypeInferenceError('UNEXPECTED: Missing return type.', node)
 		} else {
 			const paramTypes: FunctionTypeParameter[] = []
 

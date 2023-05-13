@@ -41,7 +41,7 @@ ImportSpecifier:
 ExportSpecifier:
 	"export" "{" (bindings+=ExportDeclarator ("," bindings+=ExportDeclarator)*)? "}" ("from" specifier=STRING)?;
 
-// foo as bar
+// The foo as bar in export { foo as bar }
 ExportDeclarator:
 	element=[NamedElement:IDENTIFIER] ("as" alias=IDENTIFIER)?;
 
@@ -61,6 +61,7 @@ EmptyStatement:
 // return foo;
 ReturnStatement:
 	"return" expression=Expression;
+// TODO ^ make sure the return is on the same line (no new lines between return and expression).
 
 // Used for blockless arrow function returns
 ArrowReturnExpression:
