@@ -7,6 +7,8 @@ TopLevelStatement:
 	( ImportDeclaration
 	| ExportSpecifier
 	| TypeDeclaration
+	| ExportedFunctionDeclaration
+	| ExportedVariableDeclaration
 	| Statement
 	) ';'?;
 
@@ -106,6 +108,12 @@ GroupLiteral:
 
 InvalidParenthesis:
 	empty?="(" ")";
+
+ExportedFunctionDeclaration:
+	"export" FunctionDeclaration;
+
+ExportedVariableDeclaration:
+	"export" VariableDeclaration;
 
 FunctionDeclaration:
 	OriginalFunctionDeclaration | GeneratorFunctionDeclaration;
