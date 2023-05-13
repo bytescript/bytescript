@@ -66,9 +66,9 @@ export function foo(foo: i32): f64 {
 	/**
 	 * This is a var
 	 */
-	let bar = 456
+	let bar = 5.6
 
-	return 2.5 + foo * bar();
+	return 2.5 + 4.5 + bar;
 }
 
 foo()

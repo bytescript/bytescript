@@ -92,7 +92,7 @@ PossibleCallExpression infers Expression:
 	({infer Identifier} element=[NamedElement:IDENTIFIER] )
 	// Called
 	// TODO For now only function declarations are callable, and a named function cannot yet reference itself (no recursion).
-	| ({infer CallExpression} callee=[FunctionDeclaration:IDENTIFIER] CallArguments );
+	| ({infer CallExpression} callee=[NamedElement:IDENTIFIER] CallArguments );
 
 NumberLiteral:
 	FloatLiteral | IntegerLiteral;
