@@ -73,8 +73,13 @@ foo(b)
 let e: f64 = 1
 let f: i32 = 456.0;
 
+f = a + b
+f = a + d
+f = c + d
+
 let rock = 1
 const car = 2
+car = 3 // TODO can't assign to const
 var boat = 3;
 
 // Not supported yet (we will need to figure out how the Wasm output will handle function expressions).
@@ -96,8 +101,7 @@ export function foo(foo: i32): f64 {
 	// 	return 123;
 	// }
 
-	return 2.5;
-	// return 2.5 + 4.5 + bar; // TODO check binary expressions
+	return 2.5 + 4.5 + bar;
 }
 
 foo()
@@ -114,6 +118,7 @@ function bar(a: f64, b: f64): f64 {
 }
 
 function baz(a: f64, b: f64): f64 {
+	// TODO infer type of call expression
 	return a * b
 	(); // ok, parens on new line
 }

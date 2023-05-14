@@ -138,7 +138,6 @@ export class ByteScriptValidator {
 				return
 			}
 
-			// Cast because we know the value exists (that's checked in getType)
 			const valueType = getType(varDecl.value)
 			if (checkTypeError(varDecl.value, valueType, accept)) return
 
@@ -166,10 +165,10 @@ export class ByteScriptValidator {
 		}
 
 		const type = getType(func)
-		checkTypeError(func, type, accept)
+		if (checkTypeError(func, type, accept)) return
 
 		const returnType = getType(func.returnType)
-		checkTypeError(func, type, accept)
+		if (checkTypeError(func.returnType ?? func, type, accept)) return
 
 		let returnStmtOrExpr: ReturnStatement | ArrowReturnExpression | null = null
 
@@ -191,7 +190,7 @@ export class ByteScriptValidator {
 			accept('error', "A function whose return type is not 'void' must return a value.", {node: func})
 		} else {
 			const returnStmtType = getType(returnStmtOrExpr)
-			checkTypeError(func, type, accept)
+			if (checkTypeError(func, returnStmtType, accept)) return
 
 			if (!isAssignable(returnType, returnStmtType)) {
 				accept(

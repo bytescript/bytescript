@@ -12,6 +12,7 @@ import {
 	isArrowReturnExpression,
 	isIdentifier,
 	isBinaryExpression,
+	isParameter,
 } from '../generated/ast'
 import {
 	createTypeInferenceError,
@@ -59,6 +60,12 @@ export function getType(node: AstNode): TypeDescription {
 		type = inferTypeExpression(node)
 	} else if (isReturnStatement(node) || isArrowReturnExpression(node)) {
 		type = getType(node.expression)
+	} else if (isParameter(node)) {
+		if (!node.type) {
+			type = createTypeInferenceError('Parameter type annotations are required (no call site inference yet).', node)
+		} else {
+			type = getType(node.type)
+		}
 	} else if (isVariableDeclaration(node)) {
 		if (node.type) {
 			type = getType(node.type)
@@ -76,17 +83,19 @@ export function getType(node: AstNode): TypeDescription {
 			for (const param of node.parameters) {
 				if (!param.type) {
 					type = createTypeInferenceError(
-						'Use parameter type annotations (parameter types not inferred from call sites yet).',
+						'Parameter type annotations are required (no call site inference yet).',
 						param,
 					)
 
 					break
 				}
 
-				paramTypes.push({
+				const paramType: FunctionTypeParameter = {
 					name: param.name,
-					type: getType(param.type),
-				})
+					type: getType(param),
+				}
+
+				paramTypes.push(paramType)
 			}
 
 			// If all params have a type (no generic inference from callsites yet).
