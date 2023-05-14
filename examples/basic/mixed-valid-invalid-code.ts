@@ -9,8 +9,11 @@
 type Foo = number;
 type Bar = number;
 
-import { xxh3 } from "./src/hash.bs";
+return 123;
 
+import { xxh3, foo } from "./src/hash.bs";
+
+// TODO ScopeProvider needs to be customized to find the xxh3 *inside* the import statement
 export { xxh3 } from "./src/hash.bs";
 
 export {
@@ -34,20 +37,49 @@ function foo3(bar: i32): i32 {
 	return 2.0;
 }
 
+asdf;
+qwerty = 2.3;
+
+// function *gen() {} // generators notsup
+
 /**
  * Hello *there*
  */
 var a = 456
+a = 1.2
+a = 3
 const b: i32 = 456
 let c = 1.0;
 let d: f64 = 1.0
+
+a + b
+a + d
+a * b
+a * d
+
+// 5 = 5; // error (good), can't assign to non-identifier
+
+// foo = 123.2;
+
+// foo = (foo: i32): f64 => 2.5; // TODO Arrow functions not working yet because ambiguous with (...) expressions.
+
+// foo.bar = 123; // TODO property access
+
+a;
+b;
+foo(b)
 
 // type error
 let e: f64 = 1
 let f: i32 = 456.0;
 
+f = a + b
+f = a + d
+f = c + d
+
 let rock = 1
 const car = 2
+car = 3 // TODO can't assign to const
 var boat = 3;
 
 // Not supported yet (we will need to figure out how the Wasm output will handle function expressions).
@@ -55,13 +87,21 @@ var boat = 3;
 //   let foo = 456
 // }
 
+/**
+ * This is a function called `foo`!
+ */
 export function foo(foo: i32): f64 {
 	/**
 	 * This is a var
 	 */
-	let bar = 456
+	let bar = 5.6
 
-	return 2.5 + foo * bar();
+	// returns in blocks not supported yet
+	// {
+	// 	return 123;
+	// }
+
+	return 2.5 + 4.5 + bar;
 }
 
 foo()
@@ -78,6 +118,7 @@ function bar(a: f64, b: f64): f64 {
 }
 
 function baz(a: f64, b: f64): f64 {
+	// TODO infer type of call expression
 	return a * b
 	(); // ok, parens on new line
 }

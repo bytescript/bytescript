@@ -1,13 +1,18 @@
 import type {AstNode} from 'langium'
 import {
 	BinaryExpression,
-	isClassicFunction,
+	isFunctionDeclaration,
+	isFunctionExpression,
 	isFloatLiteral,
 	isIntegerLiteral,
 	isReturnStatement,
 	isTypeExpression,
 	isVariableDeclaration,
 	TypeExpression,
+	isArrowReturnExpression,
+	isIdentifier,
+	isBinaryExpression,
+	isParameter,
 } from '../generated/ast'
 import {
 	createTypeInferenceError,
@@ -15,13 +20,18 @@ import {
 	createFunctionType,
 	createI32NumberType,
 	createLiteralNumberType,
-	FunctionParameter,
+	FunctionTypeParameter,
 	TypeDescription,
 } from './descriptions'
 
 const types = new Map<AstNode, TypeDescription>()
 
 export function getType(node: AstNode): TypeDescription {
+	if (!node) {
+		console.log('UNDEFINED NODE:', node)
+		// debugger
+	}
+
 	if (types.has(node)) return types.get(node)!
 
 	// Prevent recursive inference errors
@@ -29,14 +39,33 @@ export function getType(node: AstNode): TypeDescription {
 
 	let type: TypeDescription | null = null
 
-	if (isFloatLiteral(node)) {
+	if (isIdentifier(node)) {
+		if (!node.element.ref) {
+			type = createTypeInferenceError(`'${node.element.$refText}' is not defined.`, node)
+		} else {
+			type = getType(node.element.ref)
+		}
+	} else if (isBinaryExpression(node)) {
+		// For sake of simplicity for the first PoC, if there are no type
+		// errors, it means the left and right operands are the same type (for
+		// now), so simply get the left operand type.
+		// TODO Update this when/if we have type conversions depending on the
+		// operands.
+		type = getType(node.leftOperand)
+	} else if (isFloatLiteral(node)) {
 		type = createF64NumberType(node)
 	} else if (isIntegerLiteral(node)) {
 		type = createI32NumberType(node)
 	} else if (isTypeExpression(node)) {
 		type = inferTypeExpression(node)
-	} else if (isReturnStatement(node)) {
+	} else if (isReturnStatement(node) || isArrowReturnExpression(node)) {
 		type = getType(node.expression)
+	} else if (isParameter(node)) {
+		if (!node.type) {
+			type = createTypeInferenceError('Parameter type annotations are required (no call site inference yet).', node)
+		} else {
+			type = getType(node.type)
+		}
 	} else if (isVariableDeclaration(node)) {
 		if (node.type) {
 			type = getType(node.type)
@@ -45,33 +74,35 @@ export function getType(node: AstNode): TypeDescription {
 		} else {
 			type = createTypeInferenceError('All variable declarations need values for now', node)
 		}
-	} else if (isClassicFunction(node)) {
+	} else if (isFunctionDeclaration(node) || isFunctionExpression(node)) {
 		if (!node.returnType) {
-			type = createTypeInferenceError('use a return type annotation (No return type inference yet)', node)
+			type = createTypeInferenceError('UNEXPECTED: Missing return type.', node)
 		} else {
-			const paramTypes: FunctionParameter[] = []
+			const paramTypes: FunctionTypeParameter[] = []
 
 			for (const param of node.parameters) {
 				if (!param.type) {
 					type = createTypeInferenceError(
-						'use parameter type annotations (Parameter types not inferred from call sites yet)',
-						node,
+						'Parameter type annotations are required (no call site inference yet).',
+						param,
 					)
 
 					break
 				}
 
-				paramTypes.push({
-					name: node.name,
-					type: getType(param.type),
-				})
+				const paramType: FunctionTypeParameter = {
+					name: param.name,
+					type: getType(param),
+				}
+
+				paramTypes.push(paramType)
 			}
 
 			// If all params have a type (no generic inference from callsites yet).
 			if (!type) type = createFunctionType(paramTypes, getType(node.returnType))
 		}
 	} else {
-		type = createTypeInferenceError('Could not infer type for ' + node.$type, node)
+		type = createTypeInferenceError(`Could not infer type for ${node.$type}.`, node)
 	}
 
 	types.set(node, type)
@@ -94,6 +125,14 @@ export function isAssignable(from: TypeDescription, to: TypeDescription): boolea
 	return from.$type === to.$type
 }
 
-export function isAssignmentExpression(expr: BinaryExpression): boolean {
+export function isBinaryExpressionAssignment(expr: BinaryExpression): boolean {
 	return expr.operator === '='
+}
+
+export function isBinaryExpressionSum(expr: BinaryExpression): boolean {
+	return expr.operator === '+' || expr.operator === '-'
+}
+
+export function isBinaryExpressionProduct(expr: BinaryExpression): boolean {
+	return expr.operator === '*' || expr.operator === '/'
 }

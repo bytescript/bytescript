@@ -101,10 +101,10 @@ export function isTypeDeclaration(item: TypeDeclaration): item is TypeDeclaratio
 export interface FunctionType {
 	readonly $type: 'function'
 	readonly returnType: TypeDescription
-	readonly parameters: FunctionParameter[]
+	readonly parameters: FunctionTypeParameter[]
 }
 
-export interface FunctionParameter {
+export interface FunctionTypeParameter {
 	name: string
 	type: TypeDescription
 }
@@ -112,7 +112,7 @@ export interface FunctionParameter {
 // export function createFunctionType(func: ClassicFunction): FunctionType {
 // const returnType: TypeDescription
 // const parameters: FunctionParameter[]
-export function createFunctionType(parameters: FunctionParameter[], returnType: TypeDescription): FunctionType {
+export function createFunctionType(parameters: FunctionTypeParameter[], returnType: TypeDescription): FunctionType {
 	return {
 		$type: 'function',
 		parameters,
