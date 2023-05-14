@@ -37,15 +37,33 @@ function foo3(bar: i32): i32 {
 	return 2.0;
 }
 
+asdf;
+qwerty = 2.3;
+
 // function *gen() {} // generators notsup
 
 /**
  * Hello *there*
  */
 var a = 456
+a = 1.2
+a = 3
 const b: i32 = 456
 let c = 1.0;
 let d: f64 = 1.0
+
+a + b
+a + d
+a * b
+a * d
+
+// 5 = 5; // error (good), can't assign to non-identifier
+
+// foo = 123.2;
+
+// foo = (foo: i32): f64 => 2.5; // TODO Arrow functions not working yet because ambiguous with (...) expressions.
+
+// foo.bar = 123; // TODO property access
 
 a;
 b;
@@ -64,6 +82,9 @@ var boat = 3;
 //   let foo = 456
 // }
 
+/**
+ * This is a function called `foo`!
+ */
 export function foo(foo: i32): f64 {
 	/**
 	 * This is a var

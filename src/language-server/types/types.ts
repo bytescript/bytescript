@@ -10,6 +10,8 @@ import {
 	isVariableDeclaration,
 	TypeExpression,
 	isArrowReturnExpression,
+	isIdentifier,
+	isBinaryExpression,
 } from '../generated/ast'
 import {
 	createTypeInferenceError,
@@ -26,7 +28,7 @@ const types = new Map<AstNode, TypeDescription>()
 export function getType(node: AstNode): TypeDescription {
 	if (!node) {
 		console.log('UNDEFINED NODE:', node)
-		debugger
+		// debugger
 	}
 
 	if (types.has(node)) return types.get(node)!
@@ -36,7 +38,20 @@ export function getType(node: AstNode): TypeDescription {
 
 	let type: TypeDescription | null = null
 
-	if (isFloatLiteral(node)) {
+	if (isIdentifier(node)) {
+		if (!node.element.ref) {
+			type = createTypeInferenceError(`'${node.element.$refText}' is not defined.`, node)
+		} else {
+			type = getType(node.element.ref)
+		}
+	} else if (isBinaryExpression(node)) {
+		// For sake of simplicity for the first PoC, if there are no type
+		// errors, it means the left and right operands are the same type (for
+		// now), so simply get the left operand type.
+		// TODO Update this when/if we have type conversions depending on the
+		// operands.
+		type = getType(node.leftOperand)
+	} else if (isFloatLiteral(node)) {
 		type = createF64NumberType(node)
 	} else if (isIntegerLiteral(node)) {
 		type = createI32NumberType(node)
@@ -101,6 +116,14 @@ export function isAssignable(from: TypeDescription, to: TypeDescription): boolea
 	return from.$type === to.$type
 }
 
-export function isAssignmentExpression(expr: BinaryExpression): boolean {
+export function isBinaryExpressionAssignment(expr: BinaryExpression): boolean {
 	return expr.operator === '='
+}
+
+export function isBinaryExpressionSum(expr: BinaryExpression): boolean {
+	return expr.operator === '+' || expr.operator === '-'
+}
+
+export function isBinaryExpressionProduct(expr: BinaryExpression): boolean {
+	return expr.operator === '*' || expr.operator === '/'
 }

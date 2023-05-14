@@ -17,7 +17,13 @@ import {
 	TypeDeclaration,
 } from './generated/ast'
 import type {ByteScriptServices} from './bytescript-module'
-import {getType, isAssignable, isAssignmentExpression} from './types/types'
+import {
+	getType,
+	isAssignable,
+	isBinaryExpressionAssignment,
+	isBinaryExpressionProduct,
+	isBinaryExpressionSum,
+} from './types/types'
 import {TypeInferenceError, isTypeInferenceError, TypeDescription, typeToString} from './types/descriptions'
 
 /**
@@ -53,8 +59,12 @@ export class ByteScriptValidator {
 	}
 
 	checkBinaryExpression(expr: BinaryExpression, accept: ValidationAcceptor) {
-		if (isAssignmentExpression(expr)) {
+		if (isBinaryExpressionAssignment(expr)) {
 			this.checkAssignmentExpression(expr, accept)
+		} else if (isBinaryExpressionSum(expr)) {
+			this.checkSumExpression(expr, accept)
+		} else if (isBinaryExpressionProduct(expr)) {
+			this.checkProductExpression(expr, accept)
 		}
 	}
 
@@ -68,11 +78,16 @@ export class ByteScriptValidator {
 
 		console.log('assignment expr:', expr)
 
+		if (!expr.leftOperand.element.ref) {
+			accept('error', `Unable to find reference named '${expr.leftOperand.element.$refText}'`, {node: expr.leftOperand})
+			return
+		}
+
 		// TODO SCOPES: this cannot infer a type, we need to know the scope and the variable declaration from which to get the type from.
 		const leftType = getType(expr.leftOperand)
 		if (checkTypeError(expr.leftOperand, leftType, accept)) return
 
-		const rightType = getType(expr.leftOperand)
+		const rightType = getType(expr.rightOperand)
 		if (checkTypeError(expr.rightOperand, rightType, accept)) return
 
 		if (!isAssignable(rightType, leftType)) {
@@ -83,11 +98,39 @@ export class ByteScriptValidator {
 		}
 	}
 
+	checkSumExpression(expr: BinaryExpression, accept: ValidationAcceptor) {
+		const leftType = getType(expr.leftOperand)
+		if (checkTypeError(expr.leftOperand, leftType, accept)) return
+
+		const rightType = getType(expr.rightOperand)
+		if (checkTypeError(expr.rightOperand, rightType, accept)) return
+
+		if (!isAssignable(rightType, leftType)) {
+			accept('error', `Type '${typeToString(rightType)}' cannot be summed to '${typeToString(leftType)}'.`, {
+				node: expr,
+				property: 'rightOperand',
+			})
+		}
+	}
+
+	checkProductExpression(expr: BinaryExpression, accept: ValidationAcceptor) {
+		const leftType = getType(expr.leftOperand)
+		if (checkTypeError(expr.leftOperand, leftType, accept)) return
+
+		const rightType = getType(expr.rightOperand)
+		if (checkTypeError(expr.rightOperand, rightType, accept)) return
+
+		if (!isAssignable(rightType, leftType)) {
+			accept('error', `Type '${typeToString(rightType)}' cannot be multiplied with '${typeToString(leftType)}'.`, {
+				node: expr,
+				property: 'rightOperand',
+			})
+		}
+	}
+
 	checkVarDeclaration(varDecl: VariableDeclaration, accept: ValidationAcceptor): void {
 		const declType = getType(varDecl)
 		if (checkTypeError(varDecl, declType, accept)) return
-
-		console.log('declaration type:', declType.$type)
 
 		if (varDecl.type) {
 			if (!varDecl.value) {
@@ -97,6 +140,7 @@ export class ByteScriptValidator {
 
 			// Cast because we know the value exists (that's checked in getType)
 			const valueType = getType(varDecl.value)
+			if (checkTypeError(varDecl.value, valueType, accept)) return
 
 			if (!isAssignable(valueType, declType)) {
 				accept('error', `Type '${typeToString(valueType)}' is not assignable to type '${typeToString(declType)}'.`, {
@@ -126,8 +170,6 @@ export class ByteScriptValidator {
 
 		const returnType = getType(func.returnType)
 		checkTypeError(func, type, accept)
-
-		console.log('function return type:', type.$type)
 
 		let returnStmtOrExpr: ReturnStatement | ArrowReturnExpression | null = null
 
@@ -191,7 +233,6 @@ export class ByteScriptValidator {
 					func?.$type !== 'GeneratorFunctionDeclaration' &&
 					func?.$type !== 'GeneratorFunctionExpression'
 				) {
-					console.log('statement container:', func?.$type)
 					accept('error', 'SyntaxError: Return statements are currently allowed only at the top-level of a function.', {
 						node: stmt,
 					})
