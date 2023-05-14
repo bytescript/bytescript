@@ -151,7 +151,7 @@ export class ByteScriptValidator {
 	}
 
 	checkFunction(func: FunctionDeclaration | FunctionExpression, accept: ValidationAcceptor): void {
-		if (func.$type === 'GeneratorFunctionDeclaration' || func.$type === 'GeneratorFunctionExpression') {
+		if (func.$type === 'GeneratorFunctionExpression') {
 			accept('error', 'Generator functions are not supported yet.', {node: func})
 			return
 		}

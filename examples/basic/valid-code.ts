@@ -32,3 +32,11 @@ let num3 = num1
 // num3 = validFunc3(1) // TODO
 
 num3 = 1 - 2 // sum expression is assignable to the var
+
+validFunc1(1, 2)
+
+// let f = (): i23 => { return 1 }
+
+// f = 1
+
+// ()

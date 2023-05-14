@@ -17,8 +17,9 @@ Statement:
 	| FunctionDeclaration
 	| ReturnStatement
 	| Block
-	| EmptyStatement
+	| FunctionExpressionStatement
 	| Expression
+	| EmptyStatement
 	) ';'?;
 
 // DECLARATION
@@ -99,25 +100,27 @@ ExportedVariableDeclaration:
 	"export" VariableDeclaration;
 
 FunctionDeclaration:
-	OriginalFunctionDeclaration | GeneratorFunctionDeclaration;
+	PossiblyNamedFunction<true>;
 
-OriginalFunctionDeclaration:
-	"function" name=IDENTIFIER Parameters (":" ReturnType)? body=Block;
+PossiblyNamedFunction<named>:
+	OriginalFunctionExpression<named> | GeneratorFunctionExpression<named>;
 
-GeneratorFunctionDeclaration:
-	"function" "*" name=IDENTIFIER Parameters (":" ReturnType)? body=Block;
+OriginalFunctionExpression<named>:
+	"function" (<named> name=IDENTIFIER) Parameters (":" ReturnType)? body=Block;
 
-FunctionExpression:
-	OriginalFunctionExpression | GeneratorFunctionExpression | ArrowFunctionExpression;
-
-OriginalFunctionExpression:
-	"function" name=IDENTIFIER? Parameters (":" ReturnType)? body=Block;
-
-GeneratorFunctionExpression:
-	"function" "*" name=IDENTIFIER? Parameters (":" ReturnType)? body=Block;
+GeneratorFunctionExpression<named>:
+	"function" "*" (<named> name=IDENTIFIER) Parameters (":" ReturnType)? body=Block;
 
 ArrowFunctionExpression:
 	Parameters (":" ReturnType)? "=>" body=(ArrowReturnExpression | Block);
+
+FunctionExpression:
+	PossiblyNamedFunction<true>
+	| PossiblyNamedFunction<false>
+	| ArrowFunctionExpression;
+
+FunctionExpressionStatement:
+	ArrowFunctionExpression;
 
 Parameter:
 	name=IDENTIFIER (":" type=TypeExpression)?;
