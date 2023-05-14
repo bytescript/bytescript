@@ -16,7 +16,6 @@ Statement:
 	( VariableDeclaration
 	| FunctionDeclaration
 	| ReturnStatement
-	// | ExpressionStatement
 	| Block
 	| EmptyStatement
 	| Expression
@@ -55,18 +54,6 @@ VariableDeclaration:
 EmptyStatement:
 	empty?=";"+;
 
-// ExpressionStatement:
-// 	expression=Expression;
-
-// return foo;
-ReturnStatement:
-	"return" expression=Expression;
-// TODO ^ make sure the return is on the same line (no new lines between return and expression).
-
-// Used for blockless arrow function returns
-ArrowReturnExpression:
-	expression=Expression;
-
 // EXPRESSION
 Expression infers Expression: // why "infers Expression" here?
 	AssignmentExpression;
@@ -80,13 +67,8 @@ SumExpression infers Expression:
 ProductExpression infers Expression:
 	PrimaryExpression ({infer BinaryExpression.leftOperand=current} operator=("*" | "/") rightOperand=PrimaryExpression)*;
 
-// Identifier:
-// 	name=IDENTIFIER;
-
 PrimaryExpression infers Expression:
-	GroupLiteral
-	// | Identifier
-	| NumberLiteral | InvalidParenthesis | PossibleCallExpression;
+	GroupLiteral | NumberLiteral | InvalidParenthesis | PossibleCallExpression;
 
 PossibleCallExpression infers Expression:
 	// Not called
@@ -139,6 +121,15 @@ ArrowFunctionExpression:
 
 Parameter:
 	name=IDENTIFIER (":" type=TypeExpression)?;
+
+// return foo;
+ReturnStatement:
+	"return" expression=Expression;
+// TODO ^ make sure the return is on the same line (no new lines between return and expression).
+
+// Used for blockless arrow function returns.
+ArrowReturnExpression:
+	expression=Expression;
 
 Block:
 	"{" statements+=Statement* "}";

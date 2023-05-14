@@ -8,7 +8,6 @@ import {
 	InvalidParenthesis,
 	ReturnStatement,
 	isReturnStatement,
-	// Expression,
 	BinaryExpression,
 	FunctionExpression,
 	FunctionDeclaration,
@@ -33,7 +32,6 @@ export function registerValidationChecks(services: ByteScriptServices) {
 	const registry = services.validation.ValidationRegistry
 	const validator = services.validation.ByteScriptValidator
 	const checks: ValidationChecks<ByteScriptAstType> = {
-		// Expression: validator.checkExpression,
 		BinaryExpression: validator.checkBinaryExpression,
 		VariableDeclaration: validator.checkVarDeclaration,
 		FunctionExpression: validator.checkFunction,
