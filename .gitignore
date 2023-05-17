@@ -8,3 +8,6 @@ package-lock.json
 out/
 syntaxes/
 src/language-server/generated/
+
+# default cli output folder for now
+generated/

@@ -4,14 +4,14 @@ import type {TopLevel} from '../language-server/generated/ast'
 import {ByteScriptLanguageMetaData} from '../language-server/generated/module'
 import {createByteScriptServices} from '../language-server/bytescript-module'
 import {extractAstNode} from './cli-util'
-import {generateJavaScript} from './generator'
+import {generateWasm} from './generator'
 import {NodeFileSystem} from 'langium/node'
 
 export async function generate(fileName: string, opts: GenerateOptions): Promise<void> {
 	const services = createByteScriptServices(NodeFileSystem).ByteScript
-	const code = await extractAstNode<TopLevel>(fileName, services)
-	const generatedFilePath = generateJavaScript(code, fileName, opts.destination)
-	console.log(chalk.green(`JavaScript code generated successfully: ${generatedFilePath}`))
+	const ast = await extractAstNode<TopLevel>(fileName, services)
+	const generatedFilePath = generateWasm(ast, fileName, opts.destination)
+	console.log(chalk.green(`Build successful: ${generatedFilePath}`))
 }
 
 export type GenerateOptions = {
@@ -27,10 +27,10 @@ export default function (): void {
 
 	const fileExtensions = ByteScriptLanguageMetaData.fileExtensions.join(', ')
 	program
-		.command('generate')
+		.command('compile')
 		.argument('<file>', `source file (possible file extensions: ${fileExtensions})`)
 		.option('-d, --destination <dir>', 'destination directory of generating')
-		.description('generates JavaScript code that prints "Hello, {name}!" for each greeting in a source file')
+		.description('Compiles ByteScript source code to Wasm.')
 		.action(generate)
 
 	program.parse(process.argv)
