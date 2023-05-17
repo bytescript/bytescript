@@ -51,7 +51,9 @@
 		"lint": "prettier . --check && eslint src --ext ts",
 		"langium:generate": "langium generate",
 		"langium:watch": "langium generate --watch",
-		"format:all": "prettier --write ."
+		"format:all": "prettier --write .",
+		"wat2wasm": "wat2wasm generated/poc1.wat -o generated/poc1.wasm",
+		"test": "./bin/cli compile examples/basic/poc1.ts && npm run wat2wasm && node test/test.mjs && echo 'Tests passed!'"
 	},
 	"dependencies": {
 		"chalk": "^4.1.2",
@@ -67,9 +69,11 @@
 		"@types/vscode": "^1.56.0",
 		"@typescript-eslint/eslint-plugin": "^5.28.0",
 		"@typescript-eslint/parser": "^5.28.0",
+		"binaryen": "^113.0.0",
 		"eslint": "^8.17.0",
 		"langium-cli": "~1.0.0",
 		"prettier": "^2.8.4",
-		"typescript": "^4.9.4"
+		"typescript": "^4.9.4",
+		"wabt": "^1.0.32"
 	}
 }
