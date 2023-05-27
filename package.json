@@ -41,7 +41,7 @@
 		"src"
 	],
 	"bin": {
-		"bytescript-cli": "./bin/cli"
+		"bs": "./bin/cli.js"
 	},
 	"main": "./out/extension.js",
 	"scripts": {
@@ -53,9 +53,11 @@
 		"langium:watch": "langium generate --watch",
 		"format:all": "prettier --write .",
 		"wat2wasm": "wat2wasm generated/poc1.wat -o generated/poc1.wasm",
-		"test": "npm run test:compile && npm run test:node && echo 'Tests passed!'",
-		"test:compile": "./bin/cli compile examples/basic/poc1.ts && npm run wat2wasm",
-		"test:node": "node tests/node/test.mjs"
+		"wtr": "web-test-runner tests/browser/*.ts --node-resolve",
+		"test": "npm run lint && npm run test:compile && npm run test:node && npm run test:browser && echo 'Tests passed!'",
+		"test:compile": "./bin/cli.js compile examples/basic/poc1.ts && npm run wat2wasm",
+		"test:node": "node tests/node/test.mjs",
+		"test:browser": "npm run wtr"
 	},
 	"dependencies": {
 		"chalk": "^4.1.2",
@@ -64,13 +66,17 @@
 		"langium": "~1.0.0",
 		"vscode-languageclient": "^8.0.2",
 		"vscode-languageserver": "^8.0.2",
-		"vscode-uri": "^3.0.2"
+		"vscode-uri": "^3.0.2",
+		"wdeasync": "^0.1.118"
 	},
 	"devDependencies": {
+		"@open-wc/testing": "^3.1.8",
 		"@types/node": "^14.17.3",
 		"@types/vscode": "^1.56.0",
 		"@typescript-eslint/eslint-plugin": "^5.28.0",
 		"@typescript-eslint/parser": "^5.28.0",
+		"@web/dev-server-esbuild": "^0.4.1",
+		"@web/test-runner": "^0.16.1",
 		"binaryen": "^113.0.0",
 		"eslint": "^8.17.0",
 		"langium-cli": "~1.0.0",

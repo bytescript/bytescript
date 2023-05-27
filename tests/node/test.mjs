@@ -8,3 +8,5 @@ const {add} = wasmModule.instance.exports
 const sum = add(5, 6)
 
 console.assert(sum === 11, 'expected 5+6 = 11')
+
+console.log('Node test passed!')
