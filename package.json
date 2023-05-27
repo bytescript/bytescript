@@ -55,7 +55,7 @@
 		"wat2wasm": "wat2wasm generated/poc1.wat -o generated/poc1.wasm",
 		"wtr": "web-test-runner tests/browser/*.ts --node-resolve",
 		"test": "npm run lint && npm run test:compile && npm run test:node && npm run test:browser && echo 'Tests passed!'",
-		"test:compile": "./bin/cli.js compile examples/basic/poc1.ts && npm run wat2wasm",
+		"test:compile": "node ./bin/cli.js compile examples/basic/poc1.ts && npm run wat2wasm",
 		"test:node": "node tests/node/test.mjs",
 		"test:browser": "npm run wtr"
 	},
