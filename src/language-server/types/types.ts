@@ -13,7 +13,7 @@ import {
 	isIdentifier,
 	isBinaryExpression,
 	isParameter,
-} from '../generated/ast'
+} from '../generated/ast.js'
 import {
 	createTypeInferenceError,
 	createF64NumberType,
@@ -22,7 +22,7 @@ import {
 	createLiteralNumberType,
 	FunctionTypeParameter,
 	TypeDescription,
-} from './descriptions'
+} from './descriptions.js'
 
 const types = new Map<AstNode, TypeDescription>()
 

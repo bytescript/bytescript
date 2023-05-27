@@ -1,11 +1,20 @@
 import chalk from 'chalk'
 import {Command} from 'commander'
-import type {TopLevel} from '../language-server/generated/ast'
-import {ByteScriptLanguageMetaData} from '../language-server/generated/module'
-import {createByteScriptServices} from '../language-server/bytescript-module'
-import {extractAstNode} from './cli-util'
-import {generateWasm} from './generator'
-import {NodeFileSystem} from 'langium/node'
+import type {TopLevel} from '../language-server/generated/ast.js'
+import {ByteScriptLanguageMetaData} from '../language-server/generated/module.js'
+import {createByteScriptServices} from '../language-server/bytescript-module.js'
+import {extractAstNode} from './cli-util.js'
+import {generateWasm} from './generator.js'
+import {NodeFileSystem} from 'langium/node.js'
+
+// This is better, but changes the tsc compiler root, resulting in out/src/...
+// Perhaps put output next to source files?
+// import pkg from '../../package.json' assert {type: 'json'}
+
+import fs from 'fs'
+const relative = (path: string, base: string) => new URL(path, base).href.split('file://')[1]
+const pkgFile = relative('../../package.json', import.meta.url)
+const pkg = JSON.parse(fs.readFileSync(pkgFile).toString())
 
 export async function generate(fileName: string, opts: GenerateOptions): Promise<void> {
 	const services = createByteScriptServices(NodeFileSystem).ByteScript
@@ -23,7 +32,8 @@ export default function (): void {
 
 	program
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		.version(require('../../package.json').version)
+		// .version(require('../../package.json').version)
+		.version(pkg.version)
 
 	const fileExtensions = ByteScriptLanguageMetaData.fileExtensions.join(', ')
 	program

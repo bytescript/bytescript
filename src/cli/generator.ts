@@ -7,12 +7,12 @@ import {
 	isExportedFunctionDeclaration,
 	isOriginalFunctionDeclaration,
 	isReturnStatement,
-} from '../language-server/generated/ast'
-import {extractDestinationAndName} from './cli-util'
-import {isBinaryExpressionSum} from '../language-server/types/types'
-import {getType} from '../language-server/types/types'
-import {isI32NumberType} from '../language-server/types/descriptions'
-import {isBinaryExpressionProduct} from '../language-server/types/types'
+} from '../language-server/generated/ast.js'
+import {extractDestinationAndName} from './cli-util.js'
+import {isBinaryExpressionSum} from '../language-server/types/types.js'
+import {getType} from '../language-server/types/types.js'
+import {isI32NumberType} from '../language-server/types/descriptions.js'
+import {isBinaryExpressionProduct} from '../language-server/types/types.js'
 
 export function generateWasm(topLevel: TopLevel, filePath: string, destination: string | undefined): string {
 	const data = extractDestinationAndName(filePath, destination)

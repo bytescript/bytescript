@@ -15,12 +15,10 @@
 		"strict": true,
 		"noUnusedLocals": true,
 		"noImplicitReturns": true,
-		"noImplicitOverride": true
+		"noImplicitOverride": true,
 
-		// Cannot leave this turned on yet. https://github.com/langium/langium/issues/960
-		// For now, turn it on, fix errors in our non-generated code, then turn it off.
-		// "importsNotUsedAsValues": "error"
+		"importsNotUsedAsValues": "error"
 	},
-	"include": ["src/**/*.ts"],
+	"include": ["./**/*.ts"],
 	"exclude": ["out", "node_modules"]
 }

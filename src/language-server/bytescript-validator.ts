@@ -14,16 +14,16 @@ import {
 	Block,
 	ArrowReturnExpression,
 	TypeDeclaration,
-} from './generated/ast'
-import type {ByteScriptServices} from './bytescript-module'
+} from './generated/ast.js'
+import type {ByteScriptServices} from './bytescript-module.js'
 import {
 	getType,
 	isAssignable,
 	isBinaryExpressionAssignment,
 	isBinaryExpressionProduct,
 	isBinaryExpressionSum,
-} from './types/types'
-import {TypeInferenceError, isTypeInferenceError, TypeDescription, typeToString} from './types/descriptions'
+} from './types/types.js'
+import {TypeInferenceError, isTypeInferenceError, TypeDescription, typeToString} from './types/descriptions.js'
 
 /**
  * Register custom validation checks.
