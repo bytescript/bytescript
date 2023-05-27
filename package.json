@@ -53,7 +53,9 @@
 		"langium:watch": "langium generate --watch",
 		"format:all": "prettier --write .",
 		"wat2wasm": "wat2wasm generated/poc1.wat -o generated/poc1.wasm",
-		"test": "./bin/cli compile examples/basic/poc1.ts && npm run wat2wasm && node test/test.mjs && echo 'Tests passed!'"
+		"test": "npm run test:compile && npm run test:node && echo 'Tests passed!'",
+		"test:compile": "./bin/cli compile examples/basic/poc1.ts && npm run wat2wasm",
+		"test:node": "node tests/node/test.mjs"
 	},
 	"dependencies": {
 		"chalk": "^4.1.2",
