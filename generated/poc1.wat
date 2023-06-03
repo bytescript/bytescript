@@ -1,8 +1,12 @@
 (module
-(func $add (param $a i32) (param $b i32) (result i32)
-(i32.add
-(local.get $a)(local.get $b)
-)
-)
-(export "add" (func $add))
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
+ (export "add" (func $add))
+ (func $add (param $0 i32) (param $1 i32) (result i32)
+  (return
+   (i32.add
+    (local.get $0)
+    (local.get $1)
+   )
+  )
+ )
 )

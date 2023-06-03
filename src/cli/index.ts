@@ -13,7 +13,7 @@ const pkg = require('../../package.json')
 export async function generate(fileName: string, opts: GenerateOptions): Promise<void> {
 	const services = createByteScriptServices(NodeFileSystem).ByteScript
 	const ast = await extractAstNode<TopLevel>(fileName, services)
-	const generatedFilePath = generateWasm(ast, fileName, opts.destination)
+	const generatedFilePath = await generateWasm(ast, fileName, opts.destination)
 	console.log(green(`Build successful: ${generatedFilePath}`))
 }
 
