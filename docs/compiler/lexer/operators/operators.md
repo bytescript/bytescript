@@ -2,7 +2,59 @@
 
 This document provides a summary of the operators in the script language, along with their types, descriptions, precedence, and associativity.
 
+## Comparison of Operators
+
+Bytescript is a script language that has a rich set of operators for performing various operations on data. Similar script languages such as JavaScript, Python, Ruby, and Lua also have a wide range of operators that can be used for arithmetic, comparison, logical, and other operations.
+
+### JavaScript
+
+JavaScript has several types of operators including arithmetic, assignment, comparison, string, logical, bitwise, and ternary operators. For example, the addition operator (+) can be used to add numbers or concatenate strings. The assignment operator (=) assigns a value to a variable. The comparison operators (==, ===, !=, !==) compare values for equality or inequality. The logical operators (&&, ||) perform logical AND and OR operations.
+
+### Lua
+
+Lua also has a rich set of built-in operators including arithmetic, relational, logical, and miscellaneous operators. For example, the concatenation operator (..) concatenates two strings. The length operator (#) returns the length of a string or table.
+
+### Benefits and Drawbacks
+
+Having a wide range of operators can provide benefits such as increased expressiveness and readability of the script language. However, it can also introduce drawbacks such as increased complexity and potential for confusion or errors.
+
+It is important to carefully evaluate the benefits and drawbacks of including or excluding certain operators in bytescript. Consider how they affect the readability, expressiveness, and performance of the script language.
+
 ## Table of Operators
+
+| Operator | Type | Description | Precedence | Associativity | Example |
+| --- | --- | --- | --- | --- | --- |
+| + | Arithmetic | Addition | Medium | Left | `x = 3 + 4` |
+| - | Arithmetic | Subtraction | Medium | Left | `x = 3 - 4` |
+| * | Arithmetic | Multiplication | High | Left | `x = 3 * 4` |
+| / | Arithmetic | Division | High | Left | `x = 3 / 4` |
+| % | Arithmetic | Modulus (Remainder) | High | Left | `x = 3 % 4` |
+| < | Relational | Less than | Low | Left | `x < y` |
+| > | Relational | Greater than | Low | Left | `x > y` |
+| <= | Relational | Less than or equal to| Low| Left| `x <= y`|
+| >= | Relational | Greater than or equal to| Low| Left| `x >= y`|
+| == | Relational | Equal to| Low| Left| `x == y`|
+| != | Relational | Not equal to| Low| Left| `x != y`|
+| === | Relational | Strict equal to| Low| Left| `x === y`|
+| !== | Relational | Strict not equal to| Low| Left| `x !== y`|
+| && | Logical | Logical AND| Medium| Left| `(x > 0) && (y > 0)`|
+| \|\| | Logical | Logical OR| Medium| Left| `(x > 0) \|\|(y > 0)`|
+| ! | Logical | Logical NOT | High | Right | `! x`|
+| ?? | Logical | Nullish coalescing | Medium | Right | `x ?? y` |
+| = | Assignment | Assignment | Low | Right | `x = y` |
+| += | Assignment | Addition assignment | Low | Right | `x += y` |
+| -= | Assignment | Subtraction assignment | Low | Right | `x -= y` |
+| *= | Assignment | Multiplication assignment | Low | Right | `x *= y` |
+| /= | Assignment | Division assignment | Low | Right | `x /= y` |
+| %= | Assignment | Modulus assignment | Low | Right | `x %= y` |
+| & | Bitwise | Bitwise AND | Medium | Left | `x & y` |
+| \| | Bitwise | Bitwise OR | Medium | Left | `x \| y` |
+| ^ | Bitwise | Bitwise XOR | Medium | Left | `x ^ y` |
+| ~ | Bitwise | Bitwise NOT | High | Right | `~x` |
+| << | Bitwise | Bitwise left shift| High| Left| `x << 2`|
+| >> | Bitwise | Bitwise right shift| High| Left| `x >> 2`|
+| >>>| Bitwise | Bitwise unsigned right shift| High| Left| `x >>> 2`|
+| ?:| Conditional | Conditional (ternary) operator| Low| Right| `x ? y : z`|
 
 | Operator | Type | Description | Precedence | Associativity |
 | --- | --- | --- | --- | --- |
@@ -20,7 +72,7 @@ This document provides a summary of the operators in the script language, along 
 | === | Relational | Strict equal to | Low | Left |
 | !== | Relational | Strict not equal to | Low | Left |
 | && | Logical | Logical AND | Medium | Left |
-| || | Logical | Logical OR | Medium | Left |
+| \|\| | Logical | Logical OR | Medium | Left |
 | ! | Logical | Logical NOT | High | Right |
 | ?? | Logical | Nullish coalescing | Medium | Right |
 | = | Assignment | Assignment | Low | Right |
@@ -141,27 +193,3 @@ The bitwise NOT operator `~` negates an integer value by flipping all its bits a
 ## Conditional Operator
 
 The conditional operator `?:` is a ternary operator that takes three operands. It evaluates a condition and returns one of two values depending on whether the condition is true or false.
-
-## Research
-
-[Content from research.md]
-
-## Comparison
-
-[Content from comparison.md]
-
-## Syntax
-
-[Content from syntax.md]
-
-## Testing
-
-[Content from testing.md]
-
-## Precedence
-
-[Content from precedence.md]
-
-## Reference
-
-[Content from reference.md]
