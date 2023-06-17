@@ -4,19 +4,37 @@ This document provides a comprehensive list of all keywords in the [ByteScript](
 
 > Please note that this list of keywords is based on the current version of the ByteScript specification document, which can be found here: [ByteScript Specification Document](https://github.com/bytescript/bytescript/blob/master/docs/specification.md). As the ByteScript language continues to evolve, new keywords may be added or existing ones may change, so be sure to check back for updates.
 
-## Table of Contents
+## Comparison of Keywords
 
-- [const](#const)
-- [export](#export)
-- [from](#from)
-- [function](#function)
-- [import](#import)
-- [let](#let)
-- [return](#return)
-- [type](#type)
-- [var](#var)
-- [Conclusion](#conclusion)
-- [Cross-References](#cross-references)
+ByteScript is a script language that has a rich set of keywords for declaring and defining various features of the language. Similar script languages such as TypeScript, Python, Ruby, and Lua also have a wide range of keywords that can be used for creating variables, functions, classes, modules, and other constructs.
+
+### Javascript
+
+JavaScript and ByteScript share some similarities in their keywords, such as the use of `const`, `let`, and `var` for declaring variables, and `function` and `return` for defining functions. However, there are also differences between the two languages. For example, ByteScript has a set of modular keywords, including `export`, `from`, and `import`, which are used for exporting and importing variables, functions, or modules from other modules.
+
+### Lua
+
+ByteScript and Lua share some similarities in their keywords, such as the use of `function` for defining functions. However, there are also differences between the two languages. ByteScript has a set of modular keywords, including `export`, `from`, and `import`, which are used for exporting and importing variables, functions, or modules from other modules. Lua has its own set of reserved keywords, including `and`, `break`, `do`, `else`, `elseif`, `end`, `false`, `for`, `if`, `in`, `local`, `nil`, `not`, `or`, `repeat`, `return`, `then`, `true`, `until` and `while`.
+
+### Benefits and Drawbacks
+
+Having a small set of keywords can provide benefits such as reduced complexity and increased consistency of the script language. However, it can also introduce drawbacks such as limited expressiveness and flexibility of the script language.
+
+It is important to carefully evaluate the benefits and drawbacks of having a small set of keywords in bytescript. Consider how they affect the readability, expressiveness, and performance of the script language.
+
+## Table of Keywords
+
+| Keyword | Type | Description | Example |
+| --- | --- | --- | --- |
+| const | declarative | Block-scoped constant | `const x = 10;` |
+| let | declarative | Block-scoped variable | `let x = 10;` |
+| var | declarative | Function/global-scoped variable | `var x = 10;` |
+| export | modular | Exports to other modules | `export { myFunction };` |
+| from | modular | Specifies module to import from | `import { myFunction } from './myModule';` |
+| import | modular | Imports from other modules | `import { myFunction } from './myModule';` |
+| function | functional | Defines named code block | `function myFunction() {...}` |
+| return | functional | Specifies function return value | `return x + y;` |
+| type | descriptive | Describes data type | `type myVar: string;` |
 
 ## const
 
@@ -25,6 +43,24 @@ A keyword that declares a constant variable with a block scope and assigns it an
 Example:
 ```bytescript
 const x = 123
+```
+
+## let
+
+A keyword that declares a variable with a block scope and assigns it an initial value.
+
+Example:
+```bytescript
+let x = 123
+```
+
+## var
+
+A keyword that declares a variable with a global scope and assigns it an initial value.
+
+Example:
+```bytescript
+var x = 123
 ```
 
 ## export
@@ -45,15 +81,6 @@ Example:
 import { foo } from "./bar"
 ```
 
-## function
-
-A keyword that defines a named block of code that can take parameters and return a value.
-
-Example:
-```bytescript
-function add(a: i32, b: i32): i32 { return a + b }
-```
-
 ## import
 
 A keyword that imports a variable, function, or module from another module.
@@ -63,13 +90,13 @@ Example:
 import { foo } from "./bar"
 ```
 
-## let
+## function
 
-A keyword that declares a variable with a block scope and assigns it an initial value.
+A keyword that defines a named block of code that can take parameters and return a value.
 
 Example:
 ```bytescript
-let x = 123
+function add(a: i32, b: i32): i32 { return a + b }
 ```
 
 ## return
@@ -88,15 +115,6 @@ A keyword that defines a new data type as an alias for an existing data type.
 Example:
 ```bytescript
 type Foo = i32
-```
-
-## var
-
-A keyword that declares a variable with a global scope and assigns it an initial value.
-
-Example:
-```bytescript
-var x = 123
 ```
 
 ## Conclusion
