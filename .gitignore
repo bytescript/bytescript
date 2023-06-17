@@ -8,3 +8,4 @@ package-lock.json
 out/
 syntaxes/
 src/language-server/generated/
+.vs/cmake.db

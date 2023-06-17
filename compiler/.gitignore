@@ -446,6 +446,6 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 *.vcxproj
-.vs\cmake.db
 *.db
 *.sqlite
+.vs/cmake.db
