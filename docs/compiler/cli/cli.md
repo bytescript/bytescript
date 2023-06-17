@@ -49,29 +49,40 @@ Will test the bytescript `myFunction.bs` the same as if it compiles. It skips th
 
 The following commands are useful when compiling the project using cmake inside or outside of visual studio. It is assumed you have `cmake` available in your environment and the correct MSVCC resdistribuables. These are required or we will not be able to have an executable build for our correct architecture, such as `x64` or `x32` or `ARM`
 
-Before using any of the command build commands we need to make sure the project is ready to be built by **CMake**
+Before using any of the command build commands we need to make sure the project is ready to be built by **CMake**. To do this, we can use the `build.bat` file that configures and builds the project with a given configuration (Debug or Release). The file also checks for valid arguments and prints helpful messages.
 
-This command will build the compiler's executable with default build settings, **Debug** target. Used for developing and testing locally. Note that visual studio will also create your pdb files for attached debugging support.
+### Using Build Scripts
 
-```bash
-./$> cmake --build .
-```
-
-> Note that cmake should automatically generate the necessary configuration files and dependencies to build the compiler.
-
-This command will build the **Debug** version compiler executable `CMake` directly in the console. 
+To run the `build.bat` file, we can use the following command in the console:
 
 ```bash
-./$> cmake --build . --config Debug
+./$> ./build.bat
 ```
 
-This command will build the **Release** version of the compiler executable using `CMake` directly in the console.
+Or you can also specific a build configuration such as **Debug** or **Release**. If nothing is specified then debug will be used.
 
 ```bash
-./$> cmake --build . --config Release
+./$> ./build.bat [config]
 ```
 
-Alternatively you can use the build solutions inside of Visual Studio to create the executables. This process uses the `CMakeLists.txt` file as the build toolchain configuration.
+where `[config]` is either Debug or Release. If no argument is given, Debug is used by default.
+
+This command will build the compiler's executable with the specified configuration and place it in the `./bin/[config]/bsc.exe` folder. It will also create pdb files for attached debugging support if Debug configuration is used.
+
+### Using CMake directly
+
+Alternatively, you can use the following commands to configure and build the project using **CMake** directly in the console:
+
+```bash
+./$> cmake -S . -B .
+./$> cmake --build . --config [config]
+```
+
+where `[config]` is either Debug or Release. If no argument is given, Debug is used by default.
+
+These commands will do the same thing as the `build.bat` file, but without checking for valid arguments or printing helpful messages.
+
+You can also use the build solutions inside of Visual Studio to create the executables. This process uses the `CMakeLists.txt` file as the build toolchain configuration.
 
 ### Successful Compilation output
 
@@ -129,11 +140,60 @@ First make sure you have the correct target set. Next make sure your startup tar
 
 ### Cleaning Builds
 
-Sometimes we want to remove build data and start fresh. The following command will help with that
+Sometimes we want to remove build data and start fresh. The following command will help with that. The clean script will remove _all_ of the build directories and `cmake` dependendcies. If you wish to just clean the build use the following `cmake` command.
 
 ```bash
 ./$> cmake --build . --target clean
 ```
+
+## Running the CLI
+
+After compiling the project, you can run the `bsc.exe` executable to test the compiler. The executable takes a source file as an argument and compiles it into a bytecode file. The bytecode file can then be executed by the virtual machine.
+
+To run the `bsc.exe` executable, you can use the following command in the console:
+
+```bash
+./$> ./bin/[config]/bsc.exe [source]
+```
+
+where `[config]` is either Debug or Release, and `[source]` is the path to the source file.
+
+This command will compile the source file into a bytecode file and place it in the same folder as the source file. The bytecode file is a binary representation of the source code that can be executed by the virtual machine.
+
+To run the bytecode file, you can use the following command in the console:
+
+```bash
+./$> ./bin/[config]/bsvm.exe [bytecode]
+```
+
+where `[config]` is either Debug or Release, and `[bytecode]` is the path to the bytecode file.
+
+This command will execute the bytecode file using the virtual machine. The virtual machine is a program that simulates a computer that can run the bytecode instructions.
+
+The compiler and the virtual machine are separate programs that work together to run the ByteScript code. The compiler translates the human-readable source code into machine-readable bytecode, and the virtual machine executes the bytecode instructions.
+
+For example, if you have a source file called `hello.bs` that contains the following code:
+
+```bytescript
+print("Hello ByteScript!")
+```
+
+You can compile and run it using the following commands:
+
+```bash
+./$> ./bin/Debug/bsc.exe hello.bs
+./$> ./bin/Debug/bsvm.exe hello.bsc
+```
+
+This will output `Hello ByteScript!` to the console and exit.
+
+## Disclaimer
+
+Please note that the bsvm executable is not coded yet to test natively in a virtual machine. It is currently a placeholder that prints the bytecode file to the console. The actual virtual machine implementation is still under development and will be added in the future.
+
+Also, the core part of the compiler is not complete and is only working with lexical analysis and not code generation yet. This means that the compiler can only tokenize the source code and check for syntax errors, but it cannot produce valid bytecode instructions. The code generation part of the compiler is also still under development and will be added in the future.
+
+For more information, please see the GitHub issues #32 and #28.
 
 # References
 
