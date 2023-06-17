@@ -7,6 +7,7 @@ REM description: used to remove build and output directories used by CMake
 
 REM check if the bin folder exists and delete it if yes
 
+@echo.
 @if exist "./bin\" (
   @RD /S /Q "./bin"
   @echo Folder ./bin deleted successfully.
@@ -76,4 +77,4 @@ REM check if the x64 folder exists and delete it if yes
 ) else (
   @echo Folder ./x64 does not exist.
 )
-
+@echo.
