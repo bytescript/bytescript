@@ -51,12 +51,6 @@ The following commands are useful when compiling the project using cmake inside 
 
 Before using any of the command build commands we need to make sure the project is ready to be built by **CMake**
 
-run the following command in the root of the compiler project and it will update the local `CMakeFiles`
-
-```bash
-./$> cmake ../compiler
-```
-
 This command will build the compiler's executable with default build settings, **Debug** target. Used for developing and testing locally. Note that visual studio will also create your pdb files for attached debugging support.
 
 ```bash
@@ -113,6 +107,16 @@ The following is a successful build output for a machine running Windows 11 with
 ========== Rebuild started at 3:59 AM and took 05.157 seconds ==========
 ```
 
+You can alternatively run **CMake** directly in your terminal or bash, its output should look something like this on Windows 11 terminal
+
+``` bash
+PS C:\Users\xxx\Code\bytescript\compiler> cmake --build .
+MSBuild version 17.6.3+07e294721 for .NET Framework
+
+  compiler.vcxproj -> C:\Users\xxx\Code\bytescript\compiler\bin\Debug\bsc.exe
+PS C:\Users\xxx\Code\bytescript\compiler>
+```
+
 ### Troubleshooting
 
 The following sections might help explain any development setup issues you may have.
@@ -120,8 +124,6 @@ The following sections might help explain any development setup issues you may h
 #### Unable to run executable from Start button
  
 First make sure you have the correct target set. Next make sure your startup target is set to `compiler` in your solution view. To do this right click on `compiler` in the solution view, and then select `Set as Startup Project` from the context menu.
-
-Also make sure you have run `cmake ../compiler` which will generate the cmake files required for building
 
 ### Cleaning Builds
 
