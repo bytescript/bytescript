@@ -57,6 +57,8 @@ This command will build the compiler's executable with default build settings, *
 ./$> cmake --build .
 ```
 
+> Note that cmake should automatically generate the necessary configuration files and dependencies to build the compiler.
+
 This command will build the **Debug** version compiler executable `CMake` directly in the console. 
 
 ```bash
