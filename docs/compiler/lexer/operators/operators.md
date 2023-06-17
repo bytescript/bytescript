@@ -24,11 +24,11 @@ It is important to carefully evaluate the benefits and drawbacks of including or
 
 | Operator | Type | Description | Precedence | Associativity | Example |
 | --- | --- | --- | --- | --- | --- |
-| + | Arithmetic | Addition | Medium | Left | `x = 3 + 4` |
-| - | Arithmetic | Subtraction | Medium | Left | `x = 3 - 4` |
 | * | Arithmetic | Multiplication | High | Left | `x = 3 * 4` |
 | / | Arithmetic | Division | High | Left | `x = 3 / 4` |
 | % | Arithmetic | Modulus (Remainder) | High | Left | `x = 3 % 4` |
+| + | Arithmetic | Addition | Medium | Left | `x = 3 + 4` |
+| - | Arithmetic | Subtraction | Medium | Left | `x = 3 - 4` |
 | < | Relational | Less than | Low | Left | `x < y` |
 | > | Relational | Greater than | Low | Left | `x > y` |
 | <= | Relational | Less than or equal to| Low| Left| `x <= y`|
@@ -37,9 +37,9 @@ It is important to carefully evaluate the benefits and drawbacks of including or
 | != | Relational | Not equal to| Low| Left| `x != y`|
 | === | Relational | Strict equal to| Low| Left| `x === y`|
 | !== | Relational | Strict not equal to| Low| Left| `x !== y`|
+| ! | Logical | Logical NOT | High | Right | `! x`|
 | && | Logical | Logical AND| Medium| Left| `(x > 0) && (y > 0)`|
 | \|\| | Logical | Logical OR| Medium| Left| `(x > 0) \|\|(y > 0)`|
-| ! | Logical | Logical NOT | High | Right | `! x`|
 | ?? | Logical | Nullish coalescing | Medium | Right | `x ?? y` |
 | = | Assignment | Assignment | Low | Right | `x = y` |
 | += | Assignment | Addition assignment | Low | Right | `x += y` |
@@ -47,48 +47,14 @@ It is important to carefully evaluate the benefits and drawbacks of including or
 | *= | Assignment | Multiplication assignment | Low | Right | `x *= y` |
 | /= | Assignment | Division assignment | Low | Right | `x /= y` |
 | %= | Assignment | Modulus assignment | Low | Right | `x %= y` |
-| & | Bitwise | Bitwise AND | Medium | Left | `x & y` |
-| \| | Bitwise | Bitwise OR | Medium | Left | `x \| y` |
-| ^ | Bitwise | Bitwise XOR | Medium | Left | `x ^ y` |
 | ~ | Bitwise | Bitwise NOT | High | Right | `~x` |
 | << | Bitwise | Bitwise left shift| High| Left| `x << 2`|
 | >> | Bitwise | Bitwise right shift| High| Left| `x >> 2`|
 | >>>| Bitwise | Bitwise unsigned right shift| High| Left| `x >>> 2`|
+| & | Bitwise | Bitwise AND | Medium | Left | `x & y` |
+| \| | Bitwise | Bitwise OR | Medium | Left | `x \| y` |
+| ^ | Bitwise | Bitwise XOR | Medium | Left | `x ^ y` |
 | ?:| Conditional | Conditional (ternary) operator| Low| Right| `x ? y : z`|
-
-| Operator | Type | Description | Precedence | Associativity |
-| --- | --- | --- | --- | --- |
-| + | Arithmetic | Addition | Medium | Left |
-| - | Arithmetic | Subtraction | Medium | Left |
-| * | Arithmetic | Multiplication | High | Left |
-| / | Arithmetic | Division | High | Left |
-| % | Arithmetic | Modulus (Remainder) | High | Left |
-| < | Relational | Less than | Low | Left |
-| > | Relational | Greater than | Low | Left |
-| <= | Relational | Less than or equal to | Low | Left |
-| >= | Relational | Greater than or equal to | Low | Left |
-| == | Relational | Equal to | Low | Left |
-| != | Relational | Not equal to | Low | Left |
-| === | Relational | Strict equal to | Low | Left |
-| !== | Relational | Strict not equal to | Low | Left |
-| && | Logical | Logical AND | Medium | Left |
-| \|\| | Logical | Logical OR | Medium | Left |
-| ! | Logical | Logical NOT | High | Right |
-| ?? | Logical | Nullish coalescing | Medium | Right |
-| = | Assignment | Assignment | Low | Right |
-| += | Assignment | Addition assignment | Low | Right |
-| -= | Assignment | Subtraction assignment | Low | Right |
-| *= | Assignment | Multiplication assignment | Low | Right |
-| /= | Assignment | Division assignment | Low | Right |
-| %= | Assignment | Modulus assignment | Low | Right |
-| & | Bitwise | Bitwise AND | Medium | Left |
-| \| | Bitwise | Bitwise OR | Medium | Left |
-| ^ | Bitwise | Bitwise XOR | Medium | Left |
-| ~ | Bitwise | Bitwise NOT | High | Right |
-| << | Bitwise | Bitwise left shift | High | Left |
-| >> | Bitwise | Bitwise right shift | High | Left |
-| >>> | Bitwise | Bitwise unsigned right shift | High | Left |
-| ?: | Conditional | Conditional (ternary) operator | Low | Right |
 
 ## Arithmetic Operators
 
