@@ -41,6 +41,15 @@ REM check if the CMakeFiles folder exists and delete it if yes
   @echo Folder ./CMakeFiles does not exist.
 )
 
+REM also look for cmakefiles inside of the src directory
+
+@if exist "./src/CMakeFiles\" (
+  @RD /S /Q "./src/CMakeFiles"
+  @echo Folder ./src/CMakeFiles deleted successfully.
+) else (
+  @echo Folder ./src/CMakeFiles does not exist.
+)
+
 REM check if the Debug folder exists and delete it if yes
 
 @if exist "./Debug\" (
