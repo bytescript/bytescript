@@ -2,6 +2,8 @@
 
 This document provides a comprehensive list of all keywords in the [ByteScript](https://github.com/bytescript/bytescript) language. Keywords are reserved words that have a special meaning and function in the language. They cannot be used as identifiers for variables, functions, classes, or any other user-defined entities. Each keyword is accompanied by a brief description and an example of its usage in ByteScript code.
 
+> Please note that this list of keywords is based on the current version of the ByteScript specification document, which can be found here: [ByteScript Specification Document](https://github.com/bytescript/bytescript/blob/master/docs/specification.md). As the ByteScript language continues to evolve, new keywords may be added or existing ones may change, so be sure to check back for updates.
+
 ## Table of Contents
 
 - [const](#const)
@@ -14,7 +16,7 @@ This document provides a comprehensive list of all keywords in the [ByteScript](
 - [type](#type)
 - [var](#var)
 - [Conclusion](#conclusion)
-- [References](#references)
+- [Cross-References](#cross-references)
 
 ## const
 
@@ -102,6 +104,17 @@ var x = 123
 In this document, we have provided a comprehensive list of all keywords in the ByteScript language. These keywords are reserved words that have a special meaning and function in the language, and cannot be used as identifiers for user-defined entities. We have also provided brief descriptions and examples of each keyword to help you understand their usage in ByteScript code.
 
 We hope that this document will serve as a useful reference for ByteScript developers, and help them write clear and efficient code using the language's keywords. As the language continues to evolve, new keywords may be added or existing ones may change, so be sure to check back for updates.
+
+## Cross-References
+
+If you want to learn more about the ByteScript language and its features, you might want to check out some of the following documents or resources that explain more details or concepts related to the keywords, such as data types, modules, functions, or scopes:
+
+- Data types: [ByteScript Data Types](https://github.com/bytescript/bytescript/blob/master/docs/compiler/types/types.md)
+- Modules: [ByteScript Modules](https://github.com/bytescript/bytescript/blob/master/docs/compiler/modules/modules.md)
+- Functions: [ByteScript Functions](https://github.com/bytescript/bytescript/blob/master/docs/compiler/functions/functions.md)
+- Scopes: [ByteScript Scopes](https://github.com/bytescript/bytescript/blob/master/docs/compiler/scopes/scopes.md)
+
+These documents or resources will help you understand how to use the keywords in different contexts and scenarios, and how they interact with other elements of the ByteScript language.
 
 ## References
 
