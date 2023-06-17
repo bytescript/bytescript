@@ -9,3 +9,4 @@ out/
 syntaxes/
 src/language-server/generated/
 .vs/cmake.db
+.vs/slnx.sqlite
