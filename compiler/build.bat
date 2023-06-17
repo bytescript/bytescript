@@ -49,8 +49,8 @@ IF %ERRORLEVEL% NEQ 0 (
 :end
 ECHO.
 IF "%status%" EQU "0" (
-  ECHO   [92m Build completed [1mSuccessfully! [0m [0m
+  ECHO  [92m Build completed [1mSuccessfully! [0m [0m
 ) ELSE (
-  ECHO   [91m Build was [1mUnsuccessfully :( [0m [0m
+  ECHO  [91m Build was [1mUnsuccessfully :( [0m [0m
 )
 ECHO.
