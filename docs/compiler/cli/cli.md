@@ -1,9 +1,6 @@
 # CLI (Command-Line Interface)
 
-This program is a simple cli tool which allows us to compile bytescript into wasm (and wat). The compiler is created using visual studio 2022 and is a basic C++ project solution. The project structure follows standard guidelines. The following are useful information on setting up a new visual studio C++/CLR program. 
-
- - https://learn.microsoft.com/en-us/cpp/ide/walkthrough-working-with-projects-and-solutions-cpp?view=msvc-170/
- - https://learn.microsoft.com/en-us/cpp/dotnet/walkthrough-compiling-a-cpp-program-that-targets-the-clr-in-visual-studio?view=msvc-170
+This program is a simple cli tool which allows us to compile bytescript into wasm (and wat). The compiler is created using visual studio 2022 and is a basic C++ project solution. The project structure follows standard guidelines. 
 
 ## Current State
 
@@ -47,3 +44,16 @@ Will test the bytescript `myFunction.bs` the same as if it compiles. It skips th
 ```bash
 .$/ bsc myFunction.bs -test
 ```
+
+## References
+
+The following are useful information on setting up a new visual studio C++/CLR program. 
+
+ - https://learn.microsoft.com/en-us/cpp/ide/walkthrough-working-with-projects-and-solutions-cpp?view=msvc-170/
+ - https://learn.microsoft.com/en-us/cpp/dotnet/walkthrough-compiling-a-cpp-program-that-targets-the-clr-in-visual-studio?view=msvc-170
+ - https://developer.mozilla.org/en-US/docs/WebAssembly/Text_format_to_wasm
+ - https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format
+ - https://github.com/bytecodealliance/wasmtime/blob/main/docs/WASI-tutorial.md
+ - https://developer.mozilla.org/en-US/docs/WebAssembly
+ - https://github.com/WebAssembly/wabt
+ - https://www.freecodecamp.org/news/get-started-with-webassembly-using-only-14-lines-of-javascript-b37b6aaca1e4/
