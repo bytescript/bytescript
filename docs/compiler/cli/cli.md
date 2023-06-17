@@ -75,11 +75,11 @@ This command will build the **Release** version of the compiler executable using
 ./$> cmake --build . --config Release
 ```
 
- Alternatively you can use the build solutions inside of Visual Studio to create the executables. This process uses the `CMakeLists.txt` file as the build toolchain configuration.
- 
- ### Successful Compilation output
- 
- The following is a successful build output for a machine running Windows 11 with `x64` architecture.
+Alternatively you can use the build solutions inside of Visual Studio to create the executables. This process uses the `CMakeLists.txt` file as the build toolchain configuration.
+
+### Successful Compilation output
+
+The following is a successful build output for a machine running Windows 11 with `x64` architecture.
  
  ```bash
  Rebuild started...
@@ -113,16 +113,23 @@ This command will build the **Release** version of the compiler executable using
 ========== Rebuild started at 3:59 AM and took 05.157 seconds ==========
 ```
 
+### Troubleshooting
 
+The following sections might help explain any development setup issues you may have.
 
-
- ### Cleaning Builds
+#### Unable to run executable from Start button
  
- Sometimes we want to remove build data and start fresh. The following command will help with that
- 
- ```bash
- ./$> cmake --build . --target clean
- ```
+First make sure you have the correct target set. Next make sure your startup target is set to `compiler` in your solution view. To do this right click on `compiler` in the solution view, and then select `Set as Startup Project` from the context menu.
+
+Also make sure you have run `cmake ../compiler` which will generate the cmake files required for building
+
+### Cleaning Builds
+
+Sometimes we want to remove build data and start fresh. The following command will help with that
+
+```bash
+./$> cmake --build . --target clean
+```
 
 # References
 
