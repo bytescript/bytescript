@@ -27,6 +27,7 @@ jobs:
                   npm install
                   npm run langium:generate
                   npm run build
+                  npx playwright install --with-deps chromium firefox webkit msedge
                   npm test
               env:
                   CI: true
