@@ -9,21 +9,27 @@ import {
 	ReturnStatement,
 	isReturnStatement,
 	BinaryExpression,
-	FunctionExpression,
-	FunctionDeclaration,
+	AnyFunction,
 	Block,
 	ArrowReturnExpression,
 	TypeDeclaration,
-} from './generated/ast'
-import type {ByteScriptServices} from './bytescript-module'
+	isArrowFunctionExpression,
+	isAnyFunction,
+	isGeneratorFunctionExpression,
+	isBlock,
+	isAsyncFunctionExpression,
+	ExportedFunctionDeclaration,
+	isAsyncArrowFunctionExpression,
+} from './generated/ast.js'
+import type {ByteScriptServices} from './bytescript-module.js'
 import {
 	getType,
 	isAssignable,
 	isBinaryExpressionAssignment,
 	isBinaryExpressionProduct,
 	isBinaryExpressionSum,
-} from './types/types'
-import {TypeInferenceError, isTypeInferenceError, TypeDescription, typeToString} from './types/descriptions'
+} from './types/types.js'
+import {TypeInferenceError, isTypeInferenceError, TypeDescription, typeToString} from './types/descriptions.js'
 
 /**
  * Register custom validation checks.
@@ -34,13 +40,13 @@ export function registerValidationChecks(services: ByteScriptServices) {
 	const checks: ValidationChecks<ByteScriptAstType> = {
 		BinaryExpression: validator.checkBinaryExpression,
 		VariableDeclaration: validator.checkVarDeclaration,
-		FunctionExpression: validator.checkFunction,
-		FunctionDeclaration: validator.checkFunction,
+		AnyFunction: validator.checkFunction,
 		CallExpression: validator.checkCallExpression,
 		InvalidParenthesis: validator.checkInvalidParenthesis,
 		Block: validator.checkBlock,
 		TypeDeclaration: validator.checkTypeDeclaration,
 		TopLevel: validator.checkTopLevel,
+		ExportedFunctionDeclaration: validator.checkExportedFunctionDeclaration,
 	}
 	registry.register(checks, validator)
 }
@@ -49,11 +55,50 @@ export function registerValidationChecks(services: ByteScriptServices) {
  * Implementation of custom validations.
  */
 export class ByteScriptValidator {
+	constructor(...args: unknown[]) {
+		console.log('BS Validator', ...args)
+	}
+
+	checkExportedFunctionDeclaration(exportedFunc: ExportedFunctionDeclaration, accept: ValidationAcceptor) {
+		this.#checkFunctionShouldBeDeclaration(exportedFunc.function, accept)
+	}
+
 	checkTopLevel(topLevel: TopLevel, accept: ValidationAcceptor) {
 		for (const stmt of topLevel.statements) {
-			if (stmt.$type === 'ReturnStatement')
+			if (isReturnStatement(stmt))
 				accept('error', 'SyntaxError: Return statements are allowed only inside functions.', {node: stmt})
+			else if (isAnyFunction(stmt)) this.#checkFunctionShouldBeDeclaration(stmt, accept)
 		}
+	}
+
+	// Check the statements between curly braces.
+	checkBlock(block: Block, accept: ValidationAcceptor) {
+		for (const stmt of block.statements) {
+			if (isReturnStatement(stmt)) {
+				const block = stmt.$container
+				const func = block.$container
+
+				// TODO we need to get the function that a return statement is
+				// scoped to, because the return can be nested in further blocks inside
+				// a function block.
+				if (!isAnyFunction(func)) {
+					accept('error', 'SyntaxError: Return statements are currently allowed only at the top-level of a function.', {
+						node: stmt,
+					})
+				}
+			} else if (isAnyFunction(stmt)) this.#checkFunctionShouldBeDeclaration(stmt, accept)
+		}
+	}
+
+	#checkFunctionShouldBeDeclaration(func: AnyFunction, accept: ValidationAcceptor) {
+		if (isArrowFunctionExpression(func))
+			accept('error', 'SyntaxError: Arrow functions cannot be statements.', {node: func})
+		else if (isAsyncArrowFunctionExpression(func))
+			accept('error', 'SyntaxError: Async arrow functions cannot be statements.', {node: func})
+		else if (!func.name)
+			accept('error', 'SyntaxError: Unexpected nameless function. A function declaration must have a name.', {
+				node: func,
+			})
 	}
 
 	checkBinaryExpression(expr: BinaryExpression, accept: ValidationAcceptor) {
@@ -73,8 +118,6 @@ export class ByteScriptValidator {
 			})
 			return
 		}
-
-		console.log('assignment expr:', expr)
 
 		if (!expr.leftOperand.element.ref) {
 			accept('error', `Unable to find reference named '${expr.leftOperand.element.$refText}'`, {node: expr.leftOperand})
@@ -150,9 +193,12 @@ export class ByteScriptValidator {
 		}
 	}
 
-	checkFunction(func: FunctionDeclaration | FunctionExpression, accept: ValidationAcceptor): void {
-		if (func.$type === 'GeneratorFunctionDeclaration' || func.$type === 'GeneratorFunctionExpression') {
+	checkFunction(func: AnyFunction, accept: ValidationAcceptor): void {
+		if (isGeneratorFunctionExpression(func)) {
 			accept('error', 'Generator functions are not supported yet.', {node: func})
+			return
+		} else if (isAsyncFunctionExpression(func) || isAsyncArrowFunctionExpression(func)) {
+			accept('error', 'Async functions are not supported yet.', {node: func})
 			return
 		}
 
@@ -170,7 +216,7 @@ export class ByteScriptValidator {
 
 		let returnStmtOrExpr: ReturnStatement | ArrowReturnExpression | null = null
 
-		if (func.body.$type !== 'Block') {
+		if (!isBlock(func.body)) {
 			// blockless arrow function
 			returnStmtOrExpr = func.body
 		} else {
@@ -207,35 +253,11 @@ export class ByteScriptValidator {
 			return
 		}
 
-		const char = call.callee.ref.name.charAt(0)
-		if (char.toLowerCase() !== char) {
-			accept('error', 'Expected lower case name.', {node: call, property: 'callee'})
-		}
+		accept('error', 'TODO: type check call sites.', {node: call})
 	}
 
 	checkInvalidParenthesis(expression: InvalidParenthesis, accept: ValidationAcceptor) {
 		accept('error', 'SyntaxError: Expected expression.', {node: expression})
-	}
-
-	checkBlock(block: Block, accept: ValidationAcceptor) {
-		for (const stmt of block.statements) {
-			if (stmt.$type === 'ReturnStatement') {
-				const block = stmt.$container
-				const func = block.$container
-
-				if (
-					func?.$type !== 'ArrowFunctionExpression' &&
-					func?.$type !== 'OriginalFunctionExpression' &&
-					func?.$type !== 'OriginalFunctionDeclaration' &&
-					func?.$type !== 'GeneratorFunctionDeclaration' &&
-					func?.$type !== 'GeneratorFunctionExpression'
-				) {
-					accept('error', 'SyntaxError: Return statements are currently allowed only at the top-level of a function.', {
-						node: stmt,
-					})
-				}
-			}
-		}
 	}
 
 	checkTypeDeclaration(node: TypeDeclaration, accept: ValidationAcceptor) {

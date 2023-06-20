@@ -1,1 +1,33 @@
-# ... TODO ...
+name: tests
+
+on: [push]
+
+jobs:
+    build:
+        runs-on: ${{ matrix.operating-system }}
+
+        strategy:
+            matrix:
+                # TODO get tests working in Windows and macOS (help wanted!)
+                # windows-latest
+                # macos-latest
+                operating-system: [ubuntu-latest, macos-latest, windows-latest]
+
+        steps:
+            - uses: actions/checkout@v1
+              with:
+                  submodules: 'recursive'
+                  token: ${{ secrets.ACCESS_TOKEN }}
+            - name: Use Node.js latest
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: npm install, build, and test
+              run: |
+                  npm install
+                  npm run langium:generate
+                  npm run build
+                  npx playwright install --with-deps chromium firefox webkit msedge
+                  npm test
+              env:
+                  CI: true

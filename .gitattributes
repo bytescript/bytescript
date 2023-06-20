@@ -1,0 +1,2 @@
+# ensure we have the same line endings across *nix and Windows.
+* text=auto eol=lf

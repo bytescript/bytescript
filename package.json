@@ -41,32 +41,45 @@
 		"src"
 	],
 	"bin": {
-		"bytescript-cli": "./bin/cli"
+		"bs": "./bin/cli.js"
 	},
 	"main": "./out/extension.js",
 	"scripts": {
 		"vscode:prepublish": "npm run build && npm run lint",
 		"build": "tsc -b tsconfig.json",
 		"watch": "tsc -b tsconfig.json --watch",
-		"lint": "prettier . --check && eslint src --ext ts",
+		"lint": "prettier . --check && eslint src --ext ts && echo Done linting!",
 		"langium:generate": "langium generate",
 		"langium:watch": "langium generate --watch",
-		"format:all": "prettier --write ."
+		"format:all": "prettier --write .",
+		"wat2wasm": "wat2wasm generated/poc1.wat -o generated/poc1.wasm",
+		"wtr": "web-test-runner tests/browser/*.ts --node-resolve",
+		"test": "npm run lint && npm run test:compile && npm run test:node && npm run test:browser && echo 'Tests passed!'",
+		"test:compile": "node ./bin/cli.js compile examples/basic/poc1.ts && npm run wat2wasm",
+		"test:node": "node tests/node/test.mjs",
+		"test:browser": "npm run wtr"
 	},
 	"dependencies": {
+		"binaryen": "^113.0.0",
 		"chalk": "^4.1.2",
 		"chevrotain": "^10.4.1",
 		"commander": "^8.0.0",
 		"langium": "~1.0.0",
 		"vscode-languageclient": "^8.0.2",
 		"vscode-languageserver": "^8.0.2",
-		"vscode-uri": "^3.0.2"
+		"vscode-uri": "^3.0.2",
+		"wabt": "^1.0.32",
+		"wazum": "github:trusktr/wazum#simple-esm-dist-output"
 	},
 	"devDependencies": {
+		"@open-wc/testing": "^3.1.8",
 		"@types/node": "^14.17.3",
 		"@types/vscode": "^1.56.0",
 		"@typescript-eslint/eslint-plugin": "^5.28.0",
 		"@typescript-eslint/parser": "^5.28.0",
+		"@web/dev-server-esbuild": "^0.4.1",
+		"@web/test-runner": "^0.16.1",
+		"@web/test-runner-playwright": "^0.10.1",
 		"eslint": "^8.17.0",
 		"langium-cli": "~1.0.0",
 		"prettier": "^2.8.4",

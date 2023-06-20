@@ -1,12 +1,12 @@
 {
 	"compilerOptions": {
 		// Compiler setup
-		"target": "ES6",
+		"target": "esnext",
 		"module": "commonjs",
 		"lib": ["ESNext"],
 		"sourceMap": true,
 		"outDir": "out",
-		"moduleResolution": "node",
+		"moduleResolution": "nodenext",
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,

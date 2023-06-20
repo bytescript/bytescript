@@ -2,5 +2,9 @@ node_modules/
 out/
 package-lock.json
 
+# Ignore code generated into our project by langium based on our grammar.
+generated/
+syntaxes/
+
 # Ignore examples for now because they have syntax errors we're testing, prettier can't parse them.
 examples/

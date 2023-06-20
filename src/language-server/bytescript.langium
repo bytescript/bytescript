@@ -14,7 +14,9 @@ TopLevelStatement:
 
 Statement:
 	( VariableDeclaration
-	| FunctionDeclaration
+	// AnyFunction includes arrow functions, which we disallow as statements in
+	// our validator.
+	| AnyFunction
 	| ReturnStatement
 	| Block
 	| EmptyStatement
@@ -68,7 +70,7 @@ ProductExpression infers Expression:
 	PrimaryExpression ({infer BinaryExpression.leftOperand=current} operator=("*" | "/") rightOperand=PrimaryExpression)*;
 
 PrimaryExpression infers Expression:
-	GroupLiteral | NumberLiteral | InvalidParenthesis | PossibleCallExpression;
+	GroupLiteral | NumberLiteral | InvalidParenthesis | PossibleCallExpression | AnyFunction;
 
 PossibleCallExpression infers Expression:
 	// Not called
@@ -92,31 +94,42 @@ GroupLiteral:
 InvalidParenthesis:
 	empty?="(" ")";
 
+// Note, AnyFunction includes arrow functions, and we validate that arrow
+// functions cannot appear in an export statement within the validator rather
+// than at the syntax level.
 ExportedFunctionDeclaration:
-	"export" FunctionDeclaration;
+	"export" function=AnyFunction;
 
 ExportedVariableDeclaration:
 	"export" VariableDeclaration;
 
-FunctionDeclaration:
-	OriginalFunctionDeclaration | GeneratorFunctionDeclaration;
+// In our grammar we only have function expressions, and our validator validates
+// that functions used as declaration statements have names.
+AnyFunction:
+	NamableFunction | ArrowFunctionExpression | AsyncArrowFunctionExpression;
 
-OriginalFunctionDeclaration:
-	"function" name=IDENTIFIER Parameters (":" ReturnType)? body=Block;
-
-GeneratorFunctionDeclaration:
-	"function" "*" name=IDENTIFIER Parameters (":" ReturnType)? body=Block;
-
-FunctionExpression:
-	OriginalFunctionExpression | GeneratorFunctionExpression | ArrowFunctionExpression;
+NamableFunction:
+	OriginalFunctionExpression | GeneratorFunctionExpression | AsyncFunctionExpression;
 
 OriginalFunctionExpression:
-	"function" name=IDENTIFIER? Parameters (":" ReturnType)? body=Block;
+	"function" FuncFrag;
 
 GeneratorFunctionExpression:
-	"function" "*" name=IDENTIFIER? Parameters (":" ReturnType)? body=Block;
+	"function" "*" FuncFrag;
+
+AsyncFunctionExpression:
+	"async" "function" FuncFrag;
+
+fragment FuncFrag:
+	name=IDENTIFIER? Parameters (":" ReturnType)? body=Block;
 
 ArrowFunctionExpression:
+	ArrowFrag;
+
+AsyncArrowFunctionExpression:
+	"async" ArrowFrag;
+
+fragment ArrowFrag:
 	Parameters (":" ReturnType)? "=>" body=(ArrowReturnExpression | Block);
 
 Parameter:
@@ -148,7 +161,7 @@ TypeExpression:
 
 type NamedElement =
 	Parameter
-	| FunctionDeclaration
+	| NamableFunction
 	| VariableDeclaration
 	| ImportSpecifier
 	;

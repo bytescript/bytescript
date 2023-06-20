@@ -1,5 +1,5 @@
 import type {AstNode} from 'langium'
-import type {Identifier, NumberLiteral, TypeExpression} from '../generated/ast'
+import type {Identifier, NumberLiteral, TypeExpression} from '../generated/ast.js'
 
 export type TypeDescription = NumberType | FunctionType | TypeInferenceError
 

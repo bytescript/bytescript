@@ -8,9 +8,9 @@ import {
 	Module,
 	PartialLangiumServices,
 } from 'langium'
-import {ByteScriptGeneratedModule, ByteScriptGeneratedSharedModule} from './generated/module'
-import {ByteScriptValidator, registerValidationChecks} from './bytescript-validator'
-import {ByteScriptScopeProvider} from './bytescript-scope'
+import {ByteScriptGeneratedModule, ByteScriptGeneratedSharedModule} from './generated/module.js'
+import {ByteScriptValidator, registerValidationChecks} from './bytescript-validator.js'
+import {ByteScriptScopeProvider} from './bytescript-scope.js'
 
 /**
  * Declaration of custom services - add your own service classes here.

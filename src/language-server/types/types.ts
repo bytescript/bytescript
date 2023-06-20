@@ -1,8 +1,6 @@
 import type {AstNode} from 'langium'
 import {
 	BinaryExpression,
-	isFunctionDeclaration,
-	isFunctionExpression,
 	isFloatLiteral,
 	isIntegerLiteral,
 	isReturnStatement,
@@ -13,7 +11,8 @@ import {
 	isIdentifier,
 	isBinaryExpression,
 	isParameter,
-} from '../generated/ast'
+	isAnyFunction,
+} from '../generated/ast.js'
 import {
 	createTypeInferenceError,
 	createF64NumberType,
@@ -22,7 +21,7 @@ import {
 	createLiteralNumberType,
 	FunctionTypeParameter,
 	TypeDescription,
-} from './descriptions'
+} from './descriptions.js'
 
 const types = new Map<AstNode, TypeDescription>()
 
@@ -74,7 +73,7 @@ export function getType(node: AstNode): TypeDescription {
 		} else {
 			type = createTypeInferenceError('All variable declarations need values for now', node)
 		}
-	} else if (isFunctionDeclaration(node) || isFunctionExpression(node)) {
+	} else if (isAnyFunction(node)) {
 		if (!node.returnType) {
 			type = createTypeInferenceError('UNEXPECTED: Missing return type.', node)
 		} else {
