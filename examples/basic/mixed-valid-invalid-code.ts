@@ -9,6 +9,23 @@
 type Foo = number;
 type Bar = number;
 
+// function *foo() {} // generators notsup
+// async function foo() {} // async funcs notsup
+// (): i32 => {return 1+1} // Arrow func not allowed as statement
+// async (): i32 => {return 1+1} // Arrow func not allowed as statement
+// function(): i32 {return 1} // Unexpected nameless function
+// function *(): i32 {return 1} // Unexpected nameless function
+// async function(): i32 {return 1} // Unexpected nameless function
+
+let func = function foo(): i32 {return 1}
+let func2 = (): i32 => {return 1+1}
+let func3 = func2
+// let func4 = async function (): i32 => {return 1+1} // TODO This should be parser error, totally invalid with the arrow in there.
+// let func5 = async function(): i32 {return 1+1} // async func notsup
+// let func6 = function *(): i32 {return 1+1} // generator func notsup
+// let func7 = async (): i32 => {return 1+1} // async func notsup
+// let func7 = async (): i32 {return 1+1} // TODO should be parse error, invalid non-existent syntax.
+
 return 123;
 
 import { xxh3, foo } from "./src/hash.bs";
@@ -39,8 +56,6 @@ function foo3(bar: i32): i32 {
 
 asdf;
 qwerty = 2.3;
-
-// function *gen() {} // generators notsup
 
 /**
  * Hello *there*

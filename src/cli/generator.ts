@@ -5,7 +5,7 @@ import {
 	TopLevel,
 	isBinaryExpression,
 	isExportedFunctionDeclaration,
-	isOriginalFunctionDeclaration,
+	isOriginalFunctionExpression,
 	isReturnStatement,
 } from '../language-server/generated/ast.js'
 import {extractDestinationAndName} from './cli-util.js'
@@ -43,11 +43,11 @@ export async function generateWasm(
 
 		for (const stmt of topLevel.statements) {
 			// export function foo(...) {...}
-			if (isExportedFunctionDeclaration(stmt) && isOriginalFunctionDeclaration(stmt)) {
+			if (isExportedFunctionDeclaration(stmt) && isOriginalFunctionExpression(stmt.function)) {
 				// (func (param $a i32) (param $b i32) (result i32)
 				//   ...
 				// )
-				const func = stmt
+				const func = stmt.function
 
 				// Example function
 				// mod.addFunction(
@@ -116,10 +116,15 @@ export async function generateWasm(
 					}
 				}
 
-				module.addFunction(func.name, createType(params), wasmReturnType, [], wasmReturn!)
+				// If we've gotten this far, we must have already verified that
+				// the function has a name or we'd have exited with validation
+				// errors already.
+				const name = func.name!
+
+				module.addFunction(name, createType(params), wasmReturnType, [], wasmReturn!)
 
 				// (export "foo" (func $foo))
-				module.addFunctionExport(func.name, func.name)
+				module.addFunctionExport(name, name)
 			}
 		}
 
@@ -133,11 +138,11 @@ export async function generateWasm(
 
 		for (const stmt of topLevel.statements) {
 			// export function foo(...) {...}
-			if (isExportedFunctionDeclaration(stmt) && isOriginalFunctionDeclaration(stmt)) {
+			if (isExportedFunctionDeclaration(stmt) && isOriginalFunctionExpression(stmt.function)) {
 				// (func (param $a i32) (param $b i32) (result i32)
 				//   ...
 				// )
-				const func = stmt
+				const func = stmt.function
 
 				// Example:
 				// w.func(
@@ -215,8 +220,13 @@ export async function generateWasm(
 
 				if (!wasmReturn) throw new Error('This is very naive.')
 
+				// If we've gotten this far, we must have already verified that
+				// the function has a name or we'd have exited with validation
+				// errors already.
+				const name = func.name!
+
 				module.addFunc(
-					w.func(func.name, {params, locals: [], returnType: unaliasNumberType(languageReturnType)}, wasmReturn),
+					w.func(name, {params, locals: [], returnType: unaliasNumberType(languageReturnType)}, wasmReturn),
 					true, // TODO export name (true means same as function name)
 				)
 			}
@@ -233,12 +243,18 @@ export async function generateWasm(
 
 	for (const stmt of topLevel.statements) {
 		// export function foo(...) {...}
-		if (isExportedFunctionDeclaration(stmt) && isOriginalFunctionDeclaration(stmt)) {
+		if (isExportedFunctionDeclaration(stmt) && isOriginalFunctionExpression(stmt.function)) {
 			// (func (param $a i32) (param $b i32) (result i32)
 			//   ...
 			// )
-			const func = stmt
-			output.append('(func $', func.name)
+			const func = stmt.function
+
+			// If we've gotten this far, we must have already verified that
+			// the function has a name or we'd have exited with validation
+			// errors already.
+			const name = func.name!
+
+			output.append('(func $', name)
 
 			for (const param of func.parameters) output.append(' (param $', param.name, ' ', param.type!.primitive, ')')
 			if (func.returnType) output.append(' (result ', func.returnType.primitive, ')', NL)
@@ -273,7 +289,7 @@ export async function generateWasm(
 			output.append(NL, ')')
 
 			// (export "foo" (func $foo))
-			output.append(NL, `(export "${func.name}" (func $${func.name}))`)
+			output.append(NL, `(export "${name}" (func $${name}))`)
 		}
 	}
 
