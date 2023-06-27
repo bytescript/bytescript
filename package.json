@@ -41,7 +41,8 @@
 		"src"
 	],
 	"bin": {
-		"bs": "./bin/cli.js"
+		"bs": "./bin/cli.js",
+		"bytescript": "./bin/cli.js"
 	},
 	"main": "./out/extension.js",
 	"scripts": {
